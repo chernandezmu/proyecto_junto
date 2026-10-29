@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Junto",
+    "slug": "junto",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "junto",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "co.junto.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Junto usa la cámara para tomar la foto de tu carné y de tu perfil.",
+        "NSPhotoLibraryUsageDescription": "Junto usa tus fotos para tu perfil y las fotos de tus planes."
+      }
+    },
+    "android": {
+      "package": "co.junto.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#e4f47c",
+        "foregroundImage": "./assets/images/icon.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "CAMERA",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#16141d",
+          "image": "./assets/images/icon.png",
+          "imageWidth": 96
+        }
+      ],
+      "expo-secure-store",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "color": "#e4f47c"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

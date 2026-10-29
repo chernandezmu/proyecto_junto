@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Junto · Sistema de diseño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0..1,0&display=block" rel="stylesheet">
+<style>
+/* Tokens de DESIGN.md. Oscuro por defecto. */
+:root, [data-theme="dark"] {
+  --background:#16141d; --foreground:#f3f0fa; --card:#211e2b; --muted:#2c2839; --muted-foreground:#aaa4bd;
+  --primary:#f3f0fa; --primary-foreground:#16141d; --accent:#e4f47c; --border:#e6e1f2; --shadow:#5a5180;
+  --destructive-text:#ff8a8a; --star:#f7c99a; --scrim:rgba(10,8,16,.6); --ring:#e4f47c;
+}
+[data-theme="light"] {
+  --background:#f7f4ee; --foreground:#1c1631; --card:#fffdf9; --muted:#eee9e0; --muted-foreground:#5d5770;
+  --primary:#1c1631; --primary-foreground:#f7f4ee; --border:#1c1631; --shadow:#1c1631;
+  --destructive-text:#b3261e; --star:#b8651c; --scrim:rgba(28,22,49,.5); --ring:#1c1631;
+}
+:root { --on-fill:#16141d; --lilac:#c9b8ff; --lime:#e4f47c; --sky:#a7d6f6; --mint:#a6e8cc; --peach:#f7c99a; --coral:#ff8a8a;
+  --bounce:cubic-bezier(.2,.9,.25,1.15); --pop:cubic-bezier(.3,1.5,.5,1); }
+
+* { box-sizing:border-box; }
+body { margin:0; background:var(--background); color:var(--foreground); font:400 16px/1.45 'Lexend',system-ui,sans-serif; transition:background .25s,color .25s; }
+a { color:inherit; }
+.wrap { max-width:1240px; margin:0 auto; padding:32px 16px 80px; }
+.ic { font-family:'Material Symbols Rounded'; font-weight:500; font-size:24px; line-height:1; font-variation-settings:'FILL' 1; display:inline-block; -webkit-font-smoothing:antialiased; }
+.ic.outline { font-variation-settings:'FILL' 0; }
+
+/* Tipografía */
+.display { font:800 46px/52px 'Bricolage Grotesque'; letter-spacing:-.035em; margin:0; }
+.h1 { font:800 34px/1.03 'Bricolage Grotesque'; letter-spacing:-.02em; margin:0; }
+.h1-sm { font:800 30px/1.06 'Bricolage Grotesque'; letter-spacing:-.02em; margin:0; }
+.h2 { font:800 24px/1.08 'Bricolage Grotesque'; letter-spacing:-.01em; margin:0; }
+.title { font:600 17px/1.24 'Lexend'; margin:0; }
+.body { font:400 16px/1.45 'Lexend'; margin:0; }
+.small { font:400 14px/1.43 'Lexend'; margin:0; }
+.muted { color:var(--muted-foreground); }
+.label { font:600 12px/1.15 'Lexend'; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-foreground); }
+.code { font:800 52px/1.08 'Bricolage Grotesque'; letter-spacing:.18em; font-variant-numeric:tabular-nums; }
+
+/* Componentes */
+.card { background:var(--card); border:2px solid var(--border); border-radius:20px; box-shadow:4px 4px 0 var(--shadow); padding:16px; display:flex; flex-direction:column; gap:12px; }
+.card.row { flex-direction:row; align-items:center; }
+.fill { color:var(--on-fill); }
+.row { display:flex; align-items:center; gap:8px; }
+.wrapr { flex-wrap:wrap; }
+.btn, .btn2 { border:2px solid var(--border); border-radius:999px; font:600 16px 'Lexend'; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:transform .08s linear, box-shadow .08s linear; width:100%; }
+.btn { background:var(--primary); color:var(--primary-foreground); min-height:52px; padding:0 18px; box-shadow:3px 3px 0 var(--shadow); }
+.btn2 { background:var(--card); color:var(--foreground); min-height:48px; padding:0 18px; box-shadow:3px 3px 0 var(--shadow); }
+.btn:active, .btn2:active, .ib:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadow); }
+.btn.accent { background:var(--lime); color:var(--on-fill); }
+.btn.success { background:var(--mint); color:var(--on-fill); }
+.btn.danger { background:var(--coral); color:var(--on-fill); }
+.btn.off { opacity:.35; pointer-events:none; }
+.danger-text { color:var(--destructive-text); }
+.link { font:400 14px 'Lexend'; color:var(--muted-foreground); text-decoration:underline; text-align:center; background:none; border:0; padding:12px; cursor:pointer; }
+.ib { width:44px; height:44px; border-radius:999px; border:2px solid var(--border); background:var(--card); color:var(--foreground); display:flex; align-items:center; justify-content:center; box-shadow:2px 2px 0 var(--shadow); flex:none; cursor:pointer; }
+.tile { width:52px; height:52px; border-radius:999px; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--on-fill); flex:none; }
+.chip { border:2px solid var(--border); border-radius:999px; padding:8px 14px; font:500 14px 'Lexend'; color:var(--foreground); background:transparent; display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+.chip.on { background:var(--lilac); color:var(--on-fill); box-shadow:2px 2px 0 var(--shadow); }
+.tag { border:2px solid var(--border); border-radius:999px; padding:5px 12px; font:600 13px 'Lexend'; color:var(--on-fill); white-space:nowrap; display:inline-flex; align-items:center; gap:4px; }
+.tag.soon { background:var(--muted); color:var(--muted-foreground); }
+.fld { background:var(--card); border:2px solid var(--border); border-radius:16px; min-height:52px; padding:14px 16px; font:400 16px 'Lexend'; color:var(--foreground); width:100%; outline:none; }
+.fld::placeholder { color:var(--muted-foreground); }
+.fld:focus { box-shadow:3px 3px 0 var(--shadow); }
+.fld.err { border-color:var(--destructive-text); }
+.err-msg { display:flex; gap:6px; align-items:flex-start; color:var(--destructive-text); font:500 14px/1.4 'Lexend'; }
+.otp { display:flex; gap:8px; }
+.otp span { flex:1; aspect-ratio:.82; border:2px solid var(--border); border-radius:14px; background:var(--card); display:flex; align-items:center; justify-content:center; font:800 30px 'Bricolage Grotesque'; font-variant-numeric:tabular-nums; }
+.otp span.cur { box-shadow:3px 3px 0 var(--shadow); border-color:var(--ring); }
+.seg { display:flex; border:2px solid var(--border); border-radius:999px; padding:3px; gap:3px; background:var(--card); }
+.seg > div { flex:1; text-align:center; padding:10px; border-radius:999px; font:600 14px 'Lexend'; cursor:pointer; }
+.seg > .on { background:var(--primary); color:var(--primary-foreground); }
+.tg { width:50px; height:30px; border-radius:999px; border:2px solid var(--border); background:var(--muted); position:relative; flex:none; }
+.tg::after { content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:999px; background:var(--foreground); transition:left .2s; }
+.tg.on { background:var(--mint); } .tg.on::after { left:23px; background:var(--on-fill); }
+.av { width:44px; height:44px; border-radius:999px; border:2px solid var(--border); background:var(--peach); color:var(--on-fill); display:flex; align-items:center; justify-content:center; font:800 16px 'Bricolage Grotesque'; flex:none; }
+.avs { width:34px; height:34px; font-size:13px; margin-left:-8px; }
+.stars { display:flex; gap:4px; }
+.stars .ic { font-size:40px; }
+.stars .on { color:var(--star); font-variation-settings:'FILL' 1; }
+.stars .off { color:var(--muted-foreground); font-variation-settings:'FILL' 0; }
+.media { border:2px solid var(--border); border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--on-fill); font:500 14px 'Lexend'; }
+.check { width:24px; height:24px; border:2px solid var(--border); border-radius:8px; background:var(--lilac); color:var(--on-fill); display:flex; align-items:center; justify-content:center; flex:none; }
+.check .ic { font-size:18px; }
+.banner { border:2px solid var(--border); border-radius:16px; padding:12px 14px; display:flex; gap:10px; align-items:flex-start; color:var(--on-fill); }
+
+/* Página */
+header.top { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:28px; }
+.brand { display:flex; align-items:center; gap:12px; }
+.brand img { width:48px; height:48px; border-radius:14px; border:2px solid var(--border); box-shadow:2px 2px 0 var(--shadow); }
+section { margin-top:48px; }
+section > .label { display:block; margin-bottom:6px; }
+section > .h2 { margin-bottom:16px; }
+.grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); }
+.sw { border:2px solid var(--border); border-radius:16px; overflow:hidden; background:var(--card); box-shadow:3px 3px 0 var(--shadow); }
+.sw .c { height:64px; border-bottom:2px solid var(--border); display:flex; align-items:flex-end; padding:8px 10px; font:600 13px 'Lexend'; }
+.sw .m { padding:10px; display:flex; flex-direction:column; gap:2px; }
+.sw .m b { font:600 14px 'Lexend'; }
+.sw .m span { font:400 13px/1.35 'Lexend'; color:var(--muted-foreground); }
+.ok { color:var(--foreground); }
+.typerow { display:grid; grid-template-columns:120px 1fr; gap:16px; align-items:baseline; padding:12px 0; border-bottom:2px dashed var(--muted); }
+.demo { display:grid; gap:16px; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); }
+.demo > .card { gap:14px; }
+
+/* Teléfonos */
+.phones { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; }
+.phone-wrap { display:flex; flex-direction:column; gap:10px; align-items:center; }
+.phone-wrap > .label { text-align:center; max-width:340px; }
+.ph { width:340px; height:736px; background:var(--background); color:var(--foreground); border:3px solid #000; outline:6px solid #2a2733; border-radius:46px; overflow:hidden; display:flex; flex-direction:column; position:relative; }
+.sb { display:flex; justify-content:space-between; padding:14px 26px 4px; font:600 14px 'Lexend'; flex:none; }
+.sb .ic { font-size:16px; }
+.scr { flex:1; overflow:hidden; padding:6px 20px 24px; display:flex; flex-direction:column; gap:16px; }
+.scr > * { animation:jIn .55s var(--bounce) backwards; }
+.scr > *:nth-child(2){animation-delay:.05s}.scr > *:nth-child(3){animation-delay:.1s}.scr > *:nth-child(4){animation-delay:.15s}.scr > *:nth-child(5){animation-delay:.2s}.scr > *:nth-child(6){animation-delay:.25s}.scr > *:nth-child(7){animation-delay:.3s}.scr > *:nth-child(n+8){animation-delay:.35s}
+.hdr { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.sp { flex:1; }
+.nav { position:relative; flex:none; display:flex; justify-content:space-between; align-items:flex-start; padding:8px 6px 20px; border-top:2px solid var(--border); background:var(--card); }
+.ni { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; font:600 12px/1.15 'Lexend'; color:var(--muted-foreground); white-space:nowrap; }
+.ni .ind { width:56px; height:32px; border-radius:999px; display:flex; align-items:center; justify-content:center; border:2px solid transparent; }
+.ni.on { color:var(--foreground); }
+.ni.on .ind { border-color:var(--border); box-shadow:2px 2px 0 var(--shadow); color:var(--on-fill); }
+.ni.on .ind.home { background:var(--primary); color:var(--primary-foreground); }
+.fab { position:absolute; bottom:calc(100% + 16px); right:calc(6px + (100% - 12px) / 10 - 29px); width:58px; height:58px; border-radius:999px; border:2px solid var(--border); background:var(--primary); color:var(--primary-foreground); box-shadow:3px 3px 0 var(--shadow); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .08s linear, box-shadow .08s linear; }
+.fab:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadow); }
+.fab .ic { font-size:30px; }
+.create { display:inline-flex; align-items:center; gap:4px; height:44px; padding:0 14px 0 10px; border-radius:999px; border:2px solid var(--border); background:var(--primary); color:var(--primary-foreground); box-shadow:2px 2px 0 var(--shadow); font:600 15px 'Lexend'; cursor:pointer; flex:none; }
+.create .ic { font-size:22px; }
+.sheet { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; z-index:5; }
+.sheet .bg { position:absolute; inset:0; background:var(--scrim); }
+.sheet .panel { position:relative; background:var(--background); border-top:2px solid var(--border); border-radius:28px 28px 0 0; padding:12px 20px 28px; display:flex; flex-direction:column; gap:14px; }
+.handle { width:48px; height:5px; border-radius:999px; background:var(--muted-foreground); margin:0 auto; }
+.status { width:96px; height:96px; border-radius:999px; border:2px solid var(--border); box-shadow:4px 4px 0 var(--shadow); display:flex; align-items:center; justify-content:center; color:var(--on-fill); animation:jBig .8s var(--pop) backwards; }
+.status .ic { font-size:48px; }
+.toggle-theme { display:flex; gap:8px; }
+
+@keyframes jIn { from { opacity:0; transform:translateY(26px) scale(.97); } to { opacity:1; transform:none; } }
+@keyframes jBig { 0%{opacity:0;transform:scale(0) rotate(-25deg)} 60%{opacity:1;transform:scale(1.2) rotate(8deg)} 80%{transform:scale(.95) rotate(-3deg)} 100%{transform:none} }
+@media (prefers-reduced-motion: reduce) { .scr > *, .status { animation:none !important; } .btn, .btn2, .ib, .tg::after { transition:none; } }
+@media (max-width: 400px) { .ph { width:100%; } .typerow { grid-template-columns:1fr; gap:4px; } .display { font-size:38px; line-height:44px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <img src="claude-design/junto-app-icon.png" alt="Ícono de Junto">
+    <div>
+      <div class="label">Etapa 1 · Diseño</div>
+      <h1 class="h1-sm">Sistema de diseño Junto</h1>
+    </div>
+  </div>
+  <div class="seg toggle-theme" role="radiogroup" aria-label="Tema" style="min-width:240px">
+    <div role="radio" tabindex="0" id="t-dark" class="on" aria-checked="true"><span class="ic" aria-hidden="true" style="font-size:18px;vertical-align:-3px">dark_mode</span> Oscuro</div>
+    <div role="radio" tabindex="0" id="t-light" aria-checked="false"><span class="ic" aria-hidden="true" style="font-size:18px;vertical-align:-3px">light_mode</span> Claro</div>
+  </div>
+</header>
+
+<p class="body muted" style="max-width:720px">Tokens, componentes y las pantallas que cambian o son nuevas respecto al diseño de Claude Design. La fuente de verdad es <b class="ok">DESIGN.md</b>; esta página es para verlo y aprobarlo. Cambia el tema arriba para revisar los dos modos.</p>
+
+<!-- COLORES -->
+<section>
+  <span class="label">Color</span>
+  <h2 class="h2">Tinta sobre fondo, color en los rellenos</h2>
+  <div class="grid" id="base-swatches">
+    <div class="sw"><div class="c" style="background:var(--background)">background</div><div class="m"><b>Fondo</b><span>Oscuro #16141d · Claro #f7f4ee</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--card)">card</div><div class="m"><b>Superficie</b><span>Tarjetas, campos, barra · #211e2b / #fffdf9</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--muted)">muted</div><div class="m"><b>Superficie 2</b><span>Carga, vacío, "Próximamente"</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--background);color:var(--foreground)">Aa foreground</div><div class="m"><b>Texto</b><span>16,2:1 oscuro · 15,8:1 claro</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--background);color:var(--muted-foreground)">Aa muted-foreground</div><div class="m"><b>Texto secundario</b><span>7,6:1 oscuro · 6,3:1 claro</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--card);color:var(--destructive-text)">Aa destructive-text</div><div class="m"><b>Texto de peligro</b><span>7,2:1 oscuro · 6,4:1 claro (corregido)</span></div></div>
+  </div>
+  <div class="grid" style="margin-top:16px">
+    <div class="sw"><div class="c fill" style="background:var(--lime)">lime #e4f47c</div><div class="m"><b>Marca · destacado</b><span>Una vez por pantalla. 15,2:1 con texto oscuro</span></div></div>
+    <div class="sw"><div class="c fill" style="background:var(--lilac)">lilac #c9b8ff</div><div class="m"><b>Eventos · selección · mis mensajes</b><span>10,2:1</span></div></div>
+    <div class="sw"><div class="c fill" style="background:var(--mint)">mint #a6e8cc</div><div class="m"><b>Éxito · verificado · cupos</b><span>13,0:1</span></div></div>
+    <div class="sw"><div class="c fill" style="background:var(--sky)">sky #a7d6f6</div><div class="m"><b>Información · mapa · Tours</b><span>11,8:1</span></div></div>
+    <div class="sw"><div class="c fill" style="background:var(--peach)">peach #f7c99a</div><div class="m"><b>Aviso · lleno · avatar</b><span>12,0:1</span></div></div>
+    <div class="sw"><div class="c fill" style="background:var(--coral)">coral #ff8a8a</div><div class="m"><b>Peligro · cancelar</b><span>8,0:1 · nunca como texto en claro</span></div></div>
+  </div>
+</section>
+
+<!-- TIPOGRAFÍA -->
+<section>
+  <span class="label">Tipografía</span>
+  <h2 class="h2">Bricolage Grotesque para títulos, Lexend para leer</h2>
+  <div class="typerow"><span class="label">display 46</span><p class="display">Arma planes con tu U.</p></div>
+  <div class="typerow"><span class="label">h1 34</span><p class="h1">¿Te unes o lo armas tú?</p></div>
+  <div class="typerow"><span class="label">h2 24</span><p class="h2">Parche de estudio + pizza</p></div>
+  <div class="typerow"><span class="label">title 17</span><p class="title">Cancelación gratis</p></div>
+  <div class="typerow"><span class="label">body 16</span><p class="body">Desliza entre los planes de tu campus y únete en un toque.</p></div>
+  <div class="typerow"><span class="label">small 14</span><p class="small muted">Hasta hoy 4:00 pm · El organizador verá tu perfil</p></div>
+  <div class="typerow"><span class="label">label 12</span><p class="label">Hoy · 6:00 pm</p></div>
+  <div class="typerow"><span class="label">code 52</span><p class="code" style="margin:0">4921</p></div>
+</section>
+
+<!-- COMPONENTES -->
+<section>
+  <span class="label">Componentes</span>
+  <h2 class="h2">Contorno de 2 px, sombra dura, píldoras</h2>
+  <div class="demo">
+    <div class="card">
+      <span class="label">Botones</span>
+      <button class="btn">Confirmar mi cupo</button>
+      <button class="btn accent">Crear cuenta con mi correo U <span class="ic" aria-hidden="true">arrow_forward</span></button>
+      <button class="btn success"><span class="ic" aria-hidden="true">check</span>Sí, confirmar mi cupo</button>
+      <button class="btn danger"><span class="ic" aria-hidden="true">event_busy</span>Sí, cancelar mi asistencia</button>
+      <button class="btn2">Mejor sigo inscrito</button>
+      <button class="btn off" aria-disabled="true">Publicar plan</button>
+      <button class="btn2 danger-text"><span class="ic" aria-hidden="true">delete</span>Eliminar mi cuenta</button>
+    </div>
+    <div class="card">
+      <span class="label">Chips · tags · segmentado</span>
+      <div class="row wrapr"><span class="chip on">Deporte</span><span class="chip on">Música</span><span class="chip">Estudio</span><span class="chip">Cine</span><span class="chip">Fiesta</span></div>
+      <div class="row wrapr"><span class="tag" style="background:var(--mint)">4 cupos</span><span class="tag" style="background:var(--coral)">Lleno</span><span class="tag" style="background:var(--mint)"><span class="ic" aria-hidden="true" style="font-size:16px">verified</span>Verificada</span><span class="tag soon">Próximamente</span></div>
+      <div class="seg"><div class="on">Todo mi campus</div><div>Apruebo yo</div></div>
+      <div class="seg"><div>1 h</div><div class="on">3 h</div><div>24 h</div></div>
+      <div class="row" style="justify-content:space-between"><span class="title">Recordatorios</span><span class="tg on" role="switch" aria-checked="true" aria-label="Recordatorios"></span></div>
+    </div>
+    <div class="card">
+      <span class="label">Campos</span>
+      <input class="fld" placeholder="nombre@unbosque.edu.co" aria-label="Correo">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <input class="fld err" value="ana@gmail.com" aria-label="Correo con error" aria-invalid="true">
+        <div class="err-msg"><span class="ic" aria-hidden="true" style="font-size:18px">error</span>Por ahora Junto es solo para la Universidad El Bosque. Usa tu correo @unbosque.edu.co.</div>
+      </div>
+      <span class="label">Estrellas (corregidas)</span>
+      <div class="stars" role="slider" aria-label="Calificación del plan" aria-valuemin="1" aria-valuemax="5" aria-valuenow="4" aria-valuetext="4 de 5">
+        <span class="ic on" aria-hidden="true">star</span><span class="ic on" aria-hidden="true">star</span><span class="ic on" aria-hidden="true">star</span><span class="ic on" aria-hidden="true">star</span><span class="ic off" aria-hidden="true">star</span>
+      </div>
+      <span class="label">Avatares</span>
+      <div class="row" style="padding-left:8px"><span class="av avs" style="background:var(--lilac)">A</span><span class="av avs" style="background:var(--sky)">L</span><span class="av avs" style="background:var(--lime)">M</span><span class="av avs" style="background:var(--mint)">+5</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PANTALLAS -->
+<section>
+  <span class="label" id="screens">Pantallas nuevas o cambiadas</span>
+  <h2 class="h2">Lo que no estaba en Claude Design</h2>
+  <p class="body muted" style="max-width:720px;margin-bottom:24px">Las demás pantallas del MVP (bienvenida, feed, detalle, confirmar, chat, día del plan, cancelar, publicado) se toman del diseño original con la escala de texto nueva.</p>
+
+  <div class="phones">
+
+    <!-- 1 Login OTP -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr">
+          <div class="hdr"><button class="ib" aria-label="Volver"><span class="ic" aria-hidden="true">arrow_back</span></button></div>
+          <img src="claude-design/junto-app-icon.png" alt="" style="width:64px;height:64px;border-radius:18px;border:2px solid var(--border);box-shadow:3px 3px 0 var(--shadow)">
+          <div><h3 class="h1">Hola de nuevo</h3><p class="body muted" style="margin-top:6px">Te mandamos un código a tu correo de la U.</p></div>
+          <div class="card" style="gap:10px">
+            <div class="row" style="justify-content:space-between"><span class="label">Código enviado a</span><button class="link" style="padding:0">Cambiar</button></div>
+            <div class="title" style="overflow-wrap:anywhere">ana.martinez@unbosque.edu.co</div>
+            <div class="otp" aria-label="Código de 6 dígitos"><span>4</span><span>8</span><span>1</span><span class="cur"></span><span></span><span></span></div>
+            <p class="small muted">Reenviar código en 0:42</p>
+          </div>
+          <div class="sp"></div>
+          <button class="btn off">Entrar <span class="ic" aria-hidden="true">arrow_forward</span></button>
+          <p class="small muted" style="text-align:center">¿No tienes cuenta? <b class="ok">Regístrate</b></p>
+        </div>
+      </div>
+      <span class="label">Entrar con código · sin contraseña</span>
+    </div>
+
+    <!-- 2 Registro paso 1 con consentimiento -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr">
+          <div class="hdr"><button class="ib" aria-label="Volver"><span class="ic" aria-hidden="true">arrow_back</span></button><span class="label">Paso 1 de 3</span><span style="width:44px"></span></div>
+          <div><h3 class="h1">Tu correo de la universidad</h3><p class="body muted" style="margin-top:6px">Así sabemos que todos aquí son estudiantes.</p></div>
+          <input class="fld" value="ana.martinez@unbosque.edu.co" aria-label="Correo">
+          <div class="row" style="align-items:flex-start;gap:12px">
+            <span class="check" role="checkbox" aria-checked="true"><span class="ic" aria-hidden="true">check</span></span>
+            <p class="small">Autorizo el tratamiento de mis datos según la <u>Política de datos</u> y acepto las <u>Normas de la comunidad</u>.</p>
+          </div>
+          <button class="btn2"><span class="ic" aria-hidden="true">mail</span>Enviarme el código</button>
+          <div class="sp"></div>
+          <button class="btn off">Validar código</button>
+        </div>
+      </div>
+      <span class="label">Registro 1/3 · autorización de datos</span>
+    </div>
+
+    <!-- 3 Registro paso 2 con fecha de nacimiento -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr">
+          <div class="hdr"><button class="ib" aria-label="Volver"><span class="ic" aria-hidden="true">arrow_back</span></button><span class="label">Paso 2 de 3</span><span style="width:44px"></span></div>
+          <h3 class="h1">Verifica que eres estudiante</h3>
+          <div class="media" style="height:130px;background:var(--mint)"><span class="ic" aria-hidden="true" style="font-size:40px">check_circle</span><span style="font-weight:600">carne_estudiantil.jpg · listo</span></div>
+          <input class="fld" placeholder="Código estudiantil" aria-label="Código estudiantil">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span class="label">Fecha de nacimiento</span>
+            <div class="fld row" style="justify-content:space-between"><span>14 / 03 / 2007</span><span class="ic" aria-hidden="true">calendar_month</span></div>
+            <p class="small muted">Debes tener 18 años o más.</p>
+          </div>
+          <div class="row" style="align-items:flex-start"><span class="ic muted" aria-hidden="true">lock</span><p class="small muted">Solo lo usamos para validar tu identidad y lo borramos 30 días después de revisarlo.</p></div>
+          <div class="sp"></div>
+          <button class="btn">Enviar a verificación</button>
+        </div>
+      </div>
+      <span class="label">Registro 2/3 · regla 18+</span>
+    </div>
+
+    <!-- 4 Inicio en revisión + Próximamente -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr">
+          <div class="hdr"><div class="row" style="gap:10px;min-width:0"><img src="claude-design/junto-app-icon.png" alt="" style="width:40px;height:40px;border-radius:12px;border:2px solid var(--border);box-shadow:2px 2px 0 var(--shadow)"><span class="label">El Bosque<br>en revisión</span></div><div class="row"><span class="av" aria-label="Perfil">A</span></div></div>
+          <h3 class="h1">Hola, Ana</h3>
+          <div class="banner" style="background:var(--sky)" role="status">
+            <span class="ic" aria-hidden="true">hourglass_top</span>
+            <div><div class="title">Estamos revisando tu carné</div><p class="small">Tarda menos de 24 h. Mientras tanto puedes mirar los planes, pero aún no unirte ni crear.</p></div>
+          </div>
+          <span class="label">¿Qué quieres hacer?</span>
+          <div class="card row" style="gap:14px"><span class="tile" style="background:var(--lilac)"><span class="ic" aria-hidden="true">celebration</span></span><div style="flex:1"><div class="title">Eventos</div><p class="small muted">12 planes en tu campus hoy</p></div><span class="ic" aria-hidden="true">chevron_right</span></div>
+          <div class="card row" style="gap:14px"><span class="tile" style="background:var(--muted);color:var(--muted-foreground)"><span class="ic" aria-hidden="true">directions_car</span></span><div style="flex:1"><div class="title muted">Wheels</div><p class="small muted">Carpooling a la U</p></div><span class="tag soon">Pronto</span></div>
+        </div>
+        <nav class="nav" aria-label="Navegación principal">
+          <button class="fab" aria-label="Crear"><span class="ic" aria-hidden="true">add</span></button>
+          <div class="ni on" role="tab" aria-selected="true"><span class="ind home"><span class="ic" aria-hidden="true">home</span></span>Inicio</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">celebration</span></span>Eventos</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">directions_car</span></span>Wheels</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">landscape</span></span>Tours</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">event_note</span></span>Mis planes</div>
+        </nav>
+      </div>
+      <span class="label">Inicio · barra de 5 pestañas · Crear en la burbuja +</span>
+    </div>
+
+    <!-- 4b Inicio con hoja ¿Qué quieres crear? -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr" style="opacity:.9">
+          <div class="hdr"><div class="row" style="gap:10px"><img src="claude-design/junto-app-icon.png" alt="" style="width:40px;height:40px;border-radius:12px;border:2px solid var(--border)"><span class="label">El Bosque<br>verificada</span></div><div class="row"><span class="av">A</span></div></div>
+          <h3 class="h1">Hola, Ana</h3>
+          <div class="card fill" style="background:var(--lime)"><span class="label" style="color:var(--on-fill)">Hoy · 6:00 pm</span><div class="h2">Parche de estudio + pizza</div></div>
+        </div>
+        <div class="sheet">
+          <div class="bg"></div>
+          <div class="panel" role="dialog" aria-label="¿Qué quieres crear?">
+            <div class="handle"></div>
+            <div class="row" style="justify-content:space-between"><h3 class="h2">¿Qué quieres crear?</h3><button class="ib" aria-label="Cerrar"><span class="ic" aria-hidden="true">close</span></button></div>
+            <div class="card row" style="gap:14px"><span class="tile" style="background:var(--lilac)"><span class="ic" aria-hidden="true">celebration</span></span><div style="flex:1"><div class="title">Evento</div><p class="small muted">Un plan para tu campus</p></div><span class="ic" aria-hidden="true">chevron_right</span></div>
+            <div class="card row" style="gap:14px"><span class="tile" style="background:var(--muted);color:var(--muted-foreground)"><span class="ic" aria-hidden="true">directions_car</span></span><div style="flex:1"><div class="title muted">Ruta Wheels</div><p class="small muted">Comparte tus puestos</p></div><span class="tag soon">Pronto</span></div>
+            <div class="card row" style="gap:14px"><span class="tile" style="background:var(--muted);color:var(--muted-foreground)"><span class="ic" aria-hidden="true">landscape</span></span><div style="flex:1"><div class="title muted">Tour</div><p class="small muted">Un viaje en grupo</p></div><span class="tag soon">Pronto</span></div>
+          </div>
+        </div>
+      </div>
+      <span class="label">Crear desde Inicio · hoja de opciones</span>
+    </div>
+
+    <!-- 4c Pestaña Eventos -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr">
+          <div class="hdr"><h3 class="h1-sm">Eventos</h3><div class="row"><span class="av" aria-label="Perfil">A</span></div></div>
+          <div class="card fill" style="background:var(--lilac);gap:10px"><span class="ic" aria-hidden="true" style="font-size:40px">swipe</span><div class="h2">Descubrir planes</div><p class="body">Desliza entre los planes de tu campus y únete en un toque.</p></div>
+          <div class="row" style="justify-content:space-between"><span class="label">Hoy en tu campus</span><span class="small" style="text-decoration:underline">Ver todos</span></div>
+          <div class="card row" style="padding:12px"><span class="tile" style="background:var(--lime)"><span class="ic" aria-hidden="true">sports_soccer</span></span><div style="flex:1;min-width:0"><span class="label">5:00 pm</span><div class="title">Fútbol 6 — nos falta uno</div></div><span class="tag" style="background:var(--mint)">1 cupo</span></div>
+          <div class="card row" style="padding:12px"><span class="tile" style="background:var(--lilac)"><span class="ic" aria-hidden="true">menu_book</span></span><div style="flex:1;min-width:0"><span class="label">6:00 pm</span><div class="title">Parche de estudio + pizza</div></div><span class="tag" style="background:var(--mint)">4 cupos</span></div>
+        </div>
+        <nav class="nav" aria-label="Navegación principal">
+          <button class="fab" aria-label="Crear"><span class="ic" aria-hidden="true">add</span></button>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">home</span></span>Inicio</div>
+          <div class="ni on" role="tab" aria-selected="true"><span class="ind" style="background:var(--lilac)"><span class="ic" aria-hidden="true">celebration</span></span>Eventos</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">directions_car</span></span>Wheels</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">landscape</span></span>Tours</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">event_note</span></span>Mis planes</div>
+        </nav>
+      </div>
+      <span class="label">Pestaña Eventos · la burbuja + va a "Crear plan"</span>
+    </div>
+
+    <!-- 4d Pestaña Wheels próximamente -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr">
+          <div class="hdr"><h3 class="h1-sm">Wheels</h3><div class="row"><span class="av" aria-label="Perfil">A</span></div></div>
+          <div class="card fill" style="background:var(--lime);gap:10px">
+            <div class="row" style="justify-content:space-between"><span class="ic" aria-hidden="true" style="font-size:40px">directions_car</span><span class="tag" style="background:var(--card);color:var(--foreground)">Próximamente</span></div>
+            <div class="h2">Carpooling a la U, entre estudiantes</div>
+            <p class="small">Sube al carro de alguien de tu campus que pasa por tu ruta, o comparte tus puestos libres.</p>
+          </div>
+          <div class="row" style="align-items:flex-start;gap:12px"><span class="ic" aria-hidden="true">verified_user</span><div><div class="title">Solo estudiantes verificados</div><p class="small muted">Conductores con licencia y SOAT al día.</p></div></div>
+          <div class="row" style="align-items:flex-start;gap:12px"><span class="ic" aria-hidden="true">route</span><div><div class="title">En tu ruta de siempre</div><p class="small muted">Te mostramos quién pasa cerca.</p></div></div>
+          <div class="card row"><span class="ic" aria-hidden="true">notifications_active</span><div class="title" style="flex:1">Avisarme cuando abra</div><span class="tg on" role="switch" aria-checked="true"></span></div>
+        </div>
+        <nav class="nav" aria-label="Navegación principal">
+          <button class="fab" aria-label="Crear"><span class="ic" aria-hidden="true">add</span></button>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">home</span></span>Inicio</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">celebration</span></span>Eventos</div>
+          <div class="ni on" role="tab" aria-selected="true"><span class="ind" style="background:var(--lime)"><span class="ic" aria-hidden="true">directions_car</span></span>Wheels</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">landscape</span></span>Tours</div>
+          <div class="ni" role="tab"><span class="ind"><span class="ic" aria-hidden="true">event_note</span></span>Mis planes</div>
+        </nav>
+      </div>
+      <span class="label">Pestaña Wheels · próximamente (Tours igual en celeste)</span>
+    </div>
+
+    <!-- 5 Feed vacío -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr" style="justify-content:center;align-items:center;text-align:center;gap:18px">
+          <span class="status" style="background:var(--lilac)"><span class="ic" aria-hidden="true">event_available</span></span>
+          <h3 class="h1">Todavía no hay planes hoy</h3>
+          <p class="body muted">Sé la primera persona en armar uno: los planes nuevos le aparecen a todo tu campus.</p>
+          <button class="btn"><span class="ic" aria-hidden="true">add</span>Crear un plan</button>
+          <div class="card row" style="width:100%;text-align:left"><span class="ic" aria-hidden="true">notifications_active</span><div class="title" style="flex:1">Avisarme cuando haya</div><span class="tg on" role="switch" aria-checked="true"></span></div>
+        </div>
+      </div>
+      <span class="label">Feed vacío · estado límite</span>
+    </div>
+
+    <!-- 6 Validar asistencia -->
+    <div class="phone-wrap">
+      <div class="ph">
+        <div class="sb"><span>9:41</span><span class="row" style="gap:4px"><span class="ic">signal_cellular_alt</span><span class="ic">wifi</span><span class="ic">battery_full</span></span></div>
+        <div class="scr">
+          <div class="hdr"><button class="ib" aria-label="Volver"><span class="ic" aria-hidden="true">arrow_back</span></button><span class="tag" style="background:var(--lime)">En curso</span><span style="width:44px"></span></div>
+          <div><h3 class="h1">¿Quién llegó?</h3><p class="small muted" style="margin-top:6px">Pídele a cada persona su código de 4 dígitos.</p></div>
+          <div class="card" style="align-items:center">
+            <div class="code" style="font-size:40px">49<span class="muted">··</span></div>
+            <button class="btn">Validar</button>
+          </div>
+          <div class="row" style="justify-content:space-between"><span class="label">Inscritos</span><span class="label">6 de 9 llegaron</span></div>
+          <div class="card row" style="padding:12px"><span class="av" style="background:var(--lilac)">A</span><div class="title" style="flex:1">Ana M.</div><span class="tag" style="background:var(--mint)">Llegó</span></div>
+          <div class="card row" style="padding:12px"><span class="av" style="background:var(--sky)">L</span><div class="title" style="flex:1">Luis R.</div><span class="tag" style="background:var(--peach)">Pendiente</span></div>
+        </div>
+      </div>
+      <span class="label">Validar asistencia · organizador (nueva)</span>
+    </div>
+
+  </div>
+</section>
+
+</div>
+<script>
+(function () {
+  var root = document.documentElement, dark = document.getElementById('t-dark'), light = document.getElementById('t-light');
+  function set(t) {
+    root.setAttribute('data-theme', t);
+    dark.classList.toggle('on', t === 'dark'); light.classList.toggle('on', t === 'light');
+    dark.setAttribute('aria-checked', t === 'dark'); light.setAttribute('aria-checked', t === 'light');
+    try { localStorage.setItem('junto-theme', t); } catch (e) {}
+  }
+  var saved = null; try { saved = localStorage.getItem('junto-theme'); } catch (e) {}
+  if (location.hash === '#light' || location.hash === '#dark') saved = location.hash.slice(1);
+  set(saved === 'light' ? 'light' : 'dark');
+  [[dark, 'dark'], [light, 'light']].forEach(function (p) {
+    p[0].addEventListener('click', function () { set(p[1]); });
+    p[0].addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(p[1]); } });
+  });
+})();
+</script>
+</body>
+</html>

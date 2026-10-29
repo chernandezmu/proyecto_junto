@@ -1,3 +1,9 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Dependencias y secretos (nunca al repo)
+node_modules/
+.env
+.env.*
+!.env.example
