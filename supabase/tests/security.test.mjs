@@ -132,5 +132,48 @@ await expectOk('borrar cuenta', E, `select public.delete_my_account()`);
 const left = await db.query(`select count(*)::int n from public.profiles where id = '${E}'`);
 left.rows[0].n === 0 ? ok('perfil borrado en cascada') : bad('cascada', left.rows[0].n);
 
+// ── E4 · Regresiones de la revisión de seguridad (2026-11-03) ──────────────────
+console.log('\nE4 · Regresiones');
+const N = '00000000-0000-0000-0000-00000000001a';
+const P = '00000000-0000-0000-0000-00000000001b';
+await db.exec(`insert into auth.users values ('${N}', 'nora@unbosque.edu.co'), ('${P}', 'pedro@unbosque.edu.co')`);
+await db.exec(`update public.profiles set verification_status = 'approved', full_name = 'Nora' where id = '${N}'`);
+
+// H1: "Solo mis planes" se respeta en "Quién va".
+await db.exec(`update public.profiles set visibility = 'plans' where id = '${B}'`);
+const plan4 = (await as(A, `select public.create_plan('Club de lectura', 'cultura', now() + interval '1 day', 'Biblioteca', 10, 3, 'open') as id`)).rows[0].id;
+await expectOk('Luis se une al club', B, `select public.join_plan($1) as j`, [plan4], (r) => r.rows[0].j.status === 'joined');
+await expectOk('H1 · Nora (no comparte el plan) ve a Luis anónimo', N, `select public.get_plan($1) as p`, [plan4],
+  (r) => r.rows[0].p.attendees.length === 1 && r.rows[0].p.attendees[0].name === 'Estudiante' && r.rows[0].p.attendees[0].photo === null && r.rows[0].p.attendees[0].career === null);
+await expectOk('H1 · la organizadora ve a Luis con su nombre', A, `select public.get_plan($1) as p`, [plan4], (r) => r.rows[0].p.attendees[0].name === 'Luis R.');
+await expectOk('H1 · Luis se ve a sí mismo', B, `select public.get_plan($1) as p`, [plan4], (r) => r.rows[0].p.attendees[0].name === 'Luis R.');
+
+// H3: rechazado no puede volver a pedir cupo y el plan sale de su feed.
+const plan3 = (await as(A, `select public.create_plan('Taller privado', 'arte', now() + interval '2 days', 'Bloque A', 5, 3, 'approval') as id`)).rows[0].id;
+await expectOk('Nora pide cupo', N, `select public.join_plan($1) as j`, [plan3], (r) => r.rows[0].j.status === 'pending');
+await expectOk('Ana la rechaza', A, `select public.respond_request($1, $2, false)`, [plan3, N]);
+await expectErr('H3 · Nora no puede volver a pedir', N, `select public.join_plan($1)`, [plan3], 'REJECTED');
+await expectOk('H3 · el plan sale de su feed', N, `select public.get_feed() as f`, [], (r) => r.rows[0].f.every((x) => x.id !== plan3));
+
+// H2: sin asistencias validadas, una calificación no se revela al instante.
+const plan5 = (await db.query(`insert into public.plans (campus_id, organizer_id, title, category, starts_at, place, capacity)
+  select campus_id, id, 'Picnic', 'naturaleza', now() - interval '1 hour', 'Parque', 10 from public.profiles where id = '${A}' returning id`)).rows[0].id;
+await db.exec(`insert into public.plan_members (plan_id, user_id, status, attendance_code) values ('${plan5}', '${N}', 'joined', '1234')`);
+await expectOk('Nora califica el picnic con 1', N, `select public.rate_plan($1, 1)`, [plan5]);
+await expectOk('H2 · la nota de Nora no se revela todavía', A, `select public.get_me() as m`, [], (r) => Number(r.rows[0].m.stats.rating) === 4);
+
+// E2: la foto solo puede apuntar a la carpeta propia.
+await expectErr('E2 · foto de otra carpeta rechazada', N, `update public.profiles set photo_path = '${A}/x.jpg' where id = '${N}'`, [], 'row-level security');
+await expectOk('E2 · foto de la carpeta propia', N, `update public.profiles set photo_path = '${N}/x.jpg' where id = '${N}'`);
+
+// E1: sin carné enviado no se ven planes.
+await expectErr('E1 · sin carné enviado no ve el feed', P, `select public.get_feed()`, [], 'NOT_VERIFIED');
+await expectErr('E1 · sin carné enviado no abre planes', P, `select public.get_plan($1)`, [plan4], 'NOT_VERIFIED');
+
+// E3: el correo solo cambia a otro del mismo campus.
+try { await db.exec(`update auth.users set email = 'nora@gmail.com' where id = '${N}'`); bad('E3 · cambio a gmail', 'se permitió'); } catch (e) { e.message.includes('DOMAIN_NOT_ALLOWED') ? ok('E3 · cambio a gmail rechazado') : bad('E3', e.message); }
+try { await db.exec(`update auth.users set email = 'nora@uniandes.edu.co' where id = '${N}'`); bad('E3 · cambio a otro campus', 'se permitió'); } catch (e) { e.message.includes('DOMAIN_NOT_ALLOWED') ? ok('E3 · cambio a otro campus rechazado') : bad('E3', e.message); }
+try { await db.exec(`update auth.users set email = 'nora.p@unbosque.edu.co' where id = '${N}'`); ok('E3 · cambio dentro del campus permitido'); } catch (e) { bad('E3 · mismo campus', e.message); }
+
 console.log(`\n${pass} ok · ${fail} fallos`);
 process.exit(fail ? 1 : 0);

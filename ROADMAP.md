@@ -10,7 +10,7 @@
 | E1 · Diseño | ✅ Aprobada (barra de 5 pestañas + burbuja "+" sobre Mis planes) |
 | **E2 · Código** | **⏳ Código del MVP completo y compilando; falta conectar Supabase y probar en teléfonos** |
 | **E3 · Automatizaciones** | **⏳ En paralelo: CI listo (rama `e3/ci`); APK configurado (rama `e3/eas-apk`), falta la cuenta de Expo** |
-| E4 · Seguridad | ⬜ Pendiente |
+| **E4 · Seguridad** | **⏳ Revisión guiada hecha (rama `e4/seguridad`): 3 hallazgos (1 media, 2 bajas) arreglados con pruebas; sin altos ni críticos abiertos en lo revisado. Faltan las comprobaciones ❓ en el proyecto real** |
 | E5 · Pulido | ⬜ Pendiente |
 
 **Para retomar en un chat nuevo:** abrir la carpeta `app-junto` en VS Code, iniciar una sesión de Claude Code y decir *"sigamos con el proyecto"*. El agente lee `CLAUDE.md` y la sección **Relevo** de este archivo.
@@ -22,6 +22,7 @@
 | `main` | Lo aprobado | Al día hasta E2 (código) |
 | `e3/ci` | GitHub Actions: tipos, lint, iconos, bundle de Android y 50 pruebas de la base de datos | Lista para unir a `main` |
 | `e3/eas-apk` | `mobile/eas.json` (APK `preview`) + pasos en `mobile/README.md` + este ROADMAP. Va **encima de `e3/ci`**: unir primero `e3/ci` | Lista para unir; el build necesita cuenta de Expo |
+| `e4/seguridad` | Migración `20261103120000_e4_seguridad.sql` (arreglos H1–H3 y endurecimientos), 17 pruebas nuevas (67 en total), Dependabot, SECURITY.md §5 y la app adaptada al rechazo. Va **encima de `e3/eas-apk`** | Lista para unir después de `e3/ci` y `e3/eas-apk` |
 | `etapa-2-codigo` | Igual a `main` (histórica) | Se puede borrar |
 
 **Próximo paso (bloqueante, lo hace el equipo):**
@@ -143,13 +144,15 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 - ➖ e2e con Maestro, emails con marca, Sentry (pasan a después del 16)
 - **Salida:** cada cambio en GitHub pasa lint, typecheck y tests, y genera un APK instalable
 
-### E4 · Seguridad — ⬜ · Profundidad: Estándar para el 16 → Completo después
-- ⬜ Checklist de lanzamiento
-- ⬜ Barrido rápido
-- ⬜ Revisión guiada de las zonas críticas: RLS por campus, chat, bucket de carnés, código de asistencia, OTP; la hace un agente distinto del que construyó
-- ⬜ Tests de aislamiento entre campus y entre planes
+### E4 · Seguridad — ⏳ (adelantada al 2026-11-03) · Profundidad: Estándar para el 16 → Completo después
+- ✅ Checklist de lanzamiento (SECURITY.md §5, con ✅/➖/❓)
+- ✅ Barrido rápido del repo y del bundle de Android: sin secretos
+- ✅ Revisión guiada: 3 hallazgos (H1 media, H2 y H3 bajas) + 4 endurecimientos, todos arreglados en `supabase/migrations/20261103120000_e4_seguridad.sql`, con prueba de regresión que falla sin el arreglo
+- ✅ Tests de aislamiento entre campus y entre planes (67 en total)
+- ⏳ Segunda pasada por un agente distinto del que construyó (la primera la hizo el mismo agente; ver SECURITY.md §6)
+- ⏳ Comprobaciones ❓ en el proyecto real de Supabase: trigger de dominio, borrar cuenta, ajustes de Auth, Security Advisor y backup (SECURITY.md §6)
 - ➖ Auditoría completa de 6 fases y CSP del panel web (P1, después del 16)
-- ⬜ Cierre de los ❓ legales (Ley 1581) y test de la regla 18+
+- ⏳ Legal: borradores en la app; revisión legal antes de un lanzamiento público
 - **Salida:** sin hallazgos altos ni críticos abiertos
 
 ### E5 · Optimización y pulido — ⬜ · Profundidad: Estándar
@@ -165,7 +168,7 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 > Lo actualiza cada agente al terminar su sesión (ver references/agents.md §4). El siguiente agente lo lee primero.
 
 - **Último agente:** Claude Code (Claude Opus 5.5)
-- **Etapa:** E2 casi completa + E3 en paralelo (2026-11-03). El código del MVP compila; faltan Supabase y la prueba en teléfonos. Se crearon las ramas `e3/ci` (CI) y `e3/eas-apk` (APK), descritas en "Dónde vamos".
+- **Etapa:** E2 casi completa + E3 y E4 adelantadas (2026-11-03). El código del MVP compila; faltan Supabase y la prueba en teléfonos. Ramas `e3/ci` → `e3/eas-apk` → `e4/seguridad` (en ese orden), descritas en "Dónde vamos". La revisión de seguridad dejó 3 hallazgos arreglados (SECURITY.md §5).
 - **Hecho en esta sesión:** E0, E1 aprobado y E2 (ver checklist de E2 arriba).
 - **Siguiente paso concreto:**
   1. **Supabase (lo hace el usuario, ~15 min):** seguir `supabase/README.md` §1:
@@ -190,7 +193,7 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 - **Cómo verificar:**
   - `cd mobile && npx tsc --noEmit && npx expo lint && npx expo-doctor`;
   - `npx expo export --platform android` (bundle);
-  - `cd supabase/tests && npm install && npm test` → 50 ok.
+  - `cd supabase/tests && npm install && npm test` → 67 ok.
 - **Preguntas abiertas para el usuario:** crear el proyecto de Supabase y el SMTP; primer commit cuando lo pida.
 - **No tocar / ojo con:**
   - el HTML de Claude Design es referencia, no se pega en la app;

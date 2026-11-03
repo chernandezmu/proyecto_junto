@@ -65,5 +65,5 @@ jobs:
           cache: npm
           cache-dependency-path: supabase/tests/package-lock.json
       - run: npm ci
-      - name: RLS y RPC (50 pruebas)
+      - name: RLS y RPC (pruebas de seguridad)
         run: npm test

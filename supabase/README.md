@@ -5,7 +5,11 @@ Toda la lógica de seguridad vive aquí: RLS activado en todas las tablas y func
 ## 1. Crear el proyecto (una vez)
 
 1. Entra a [supabase.com](https://supabase.com) y crea un proyecto. Región: **South America (São Paulo)**. Guarda la contraseña de la base de datos en un gestor de contraseñas: no va en la app ni en el repo.
-2. **SQL Editor → New query**: pega todo `migrations/20261029120000_init.sql` y ejecútalo (Run). Debe terminar sin errores.
+2. **SQL Editor → New query**: ejecuta las migraciones **en orden**, cada una en su propia consulta (pega todo el archivo → Run). Cada una debe terminar sin errores:
+   1. `migrations/20261029120000_init.sql`: esquema, RLS, RPC y Storage.
+   2. `migrations/20261103120000_e4_seguridad.sql`: arreglos de la revisión de seguridad (E4).
+
+   Si alguien ya había aplicado solo la primera, basta con ejecutar la segunda.
 3. **Authentication → Sign In / Providers → Email**:
    - Email activado, **"Confirm email" activado**.
    - **Email OTP Length: 6**. Expiración: 600 segundos.
@@ -23,6 +27,9 @@ Toda la lógica de seguridad vive aquí: RLS activado en todas las tablas y func
    - Host `smtp.gmail.com`, puerto `465`, usuario = el correo y contraseña = la contraseña de aplicación;
    - Sender email = el mismo correo, Sender name = `Junto`.
 6. **Authentication → Rate Limits**: deja los de fábrica (protegen el envío de códigos).
+   **Sign In / Providers**:
+   - deja activo solo **Email**; Phone, Anonymous y los proveedores sociales van desactivados;
+   - activa **"Secure email change"**: el cambio de correo pide confirmar en los dos correos, y la base de datos además exige que el nuevo sea del mismo campus.
 7. **Project Settings → API**: copia **Project URL** y la clave **publishable** (o `anon`) en `../mobile/.env`:
 
    ```
@@ -55,7 +62,7 @@ Para la demo se hace desde el panel de Supabase (el panel web propio es P1):
 ```bash
 cd supabase/tests
 npm install
-npm test        # 50 ok · 0 fallos
+npm test        # 67 ok · 0 fallos
 ```
 
 Corren la migración sobre PGlite (Postgres en WebAssembly) con stubs de Supabase. Comprueban:

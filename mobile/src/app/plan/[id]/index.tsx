@@ -110,6 +110,11 @@ export default function PlanDetail() {
           <Button label="Solicitud enviada" disabled />
           <LinkButton label="Retirar mi solicitud" onPress={() => router.push(`/plan/${p.id}/cancel`)} />
         </>
+      ) : p.myStatus === 'rejected' ? (
+        <>
+          <Button label="El organizador no aprobó tu solicitud" disabled />
+          <LinkButton label="Ver otros planes" onPress={() => router.replace('/events/feed')} />
+        </>
       ) : !approved ? (
         <Button label="Podrás unirte cuando aprobemos tu carné" disabled />
       ) : full ? (

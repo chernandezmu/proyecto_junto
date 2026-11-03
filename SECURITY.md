@@ -6,7 +6,7 @@
 
 **Profundidad acordada:** Estándar (revisión guiada) para la demo del 2026-11-16 → Completo (auditoría de 6 fases) antes de cualquier lanzamiento público. Los controles de §3 y §4 se aplican igual desde la primera línea de código.
 **Ley de datos aplicable:** Colombia · Ley 1581 de 2012 (Habeas Data) y Decreto 1377 de 2013. **Edad mínima: 18 años.** No se tratan datos de menores: la fecha de nacimiento se pide en el registro y se contrasta con el carné en la revisión.
-**Última revisión:** 2026-10-29 · Claude Code (E0)
+**Última revisión:** 2026-11-03 · Claude Code (E4 · revisión guiada, hecha por el mismo agente que construyó; ver §5)
 
 ## 1. Qué protegemos (activos)
 
@@ -68,7 +68,7 @@ Estado: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ no aplica · ❓ needs
 | Abuso | Rate limit en OTP, reenvío de código, creación de planes, mensajes, reportes y validación de asistencia; límite de planes simultáneos por organizador | ⏳ |
 | Pagos | Fuera del MVP (Wheels y Tours, fases 3 y 4) | ➖ |
 | IA | No hay funciones de IA en el MVP | ➖ |
-| Dependencias y CI | Lockfile, `npm audit` en CI, secret scanning de GitHub, permisos mínimos en los workflows, versiones fijas de las actions | ⬜ |
+| Dependencias y CI | Lockfile, `npm audit` en CI, secret scanning de GitHub, permisos mínimos en los workflows, versiones fijas de las actions | ⏳ CI con acciones fijadas por SHA, `contents: read`, sin credenciales persistidas y auditoría informativa; Dependabot configurado. Falta activar el secret scanning en GitHub ❓ |
 | Privacidad | Datos mínimos; ubicación solo del punto de encuentro, nunca la del usuario; logs sin datos personales; descargar datos y eliminar cuenta en la app (también lo exigen Apple y Google) | ⏳ |
 | Moderación | Reportar plan y usuario, bloquear, normas visibles, revisión de reportes en el panel en < 24 h (requisito de las tiendas para apps con contenido de usuarios) | ⏳ |
 | Notificaciones | Tokens push ligados al usuario, enviados solo desde el servidor; sin contenido sensible en el texto de la notificación | ⬜ |
@@ -76,15 +76,71 @@ Estado: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ no aplica · ❓ needs
 
 ## 5. Hallazgos (E4)
 
+**Revisión guiada · 2026-11-03.**
+- **Alcance:**
+  - `supabase/migrations/20261029120000_init.sql`: tablas, RLS, las 30 RPC, triggers y Storage;
+  - `mobile/src` (sesión, datos, deep links, archivos, logs);
+  - `.github/`, dependencias y el bundle de Android.
+- **Clases buscadas:** control de acceso y aislamiento entre campus, lógica de negocio (cupo, plazos, doble ciego, rechazos), privacidad, abuso, secretos, cliente móvil y cadena de suministro.
+- **Independencia:** la hizo el mismo agente que construyó el código. La skill recomienda una segunda pasada con otro agente (pendiente, §6).
+
 | Severidad | Hallazgo | Estado | Test de regresión |
 |---|---|---|---|
+| Media | **H1 · "Solo mis planes" no se respetaba.** Un estudiante verificado del campus que no comparte el plan veía en "Quién va" el nombre, la foto y la carrera de quien eligió *Quién ve mi perfil: Solo mis planes* (`get_plan` usaba `private.person` sin mirar `visibility`) | ✅ Arreglado en `20261103120000_e4_seguridad.sql` (`private.attendee`): se muestra como "Estudiante", sin foto ni carrera | `H1 · Nora (no comparte el plan) ve a Luis anónimo` + 2 de control |
+| Baja | **H2 · Doble ciego roto sin asistencias validadas.** Si el organizador no validaba ningún código, cada calificación se revelaba al instante y podía deducir la nota de cada persona viendo cambiar su promedio | ✅ Se revela a los 3 días, o cuando calificaron **todos** los que llegaron y llegó alguien | `H2 · la nota de Nora no se revela todavía` |
+| Baja | **H3 · Re-solicitudes tras un rechazo.** Una persona rechazada podía volver a pedir cupo sin límite (acoso al organizador) y el plan le seguía saliendo en el feed | ✅ `join_plan` responde `REJECTED`; el plan sale de su feed; la app lo explica | `H3 · Nora no puede volver a pedir` · `H3 · el plan sale de su feed` |
+
+**Endurecimientos aplicados** (no cruzaban un límite por sí solos):
+- **E1:** para ver planes hay que haber enviado el carné (antes bastaba el correo).
+- **E2:** la foto de perfil solo puede apuntar a la carpeta propia.
+- **E3:** el correo de la cuenta solo puede cambiar a otro del mismo campus.
+- **E4:** permisos explícitos para que `supabase_auth_admin` ejecute los triggers de `auth.users`.
+- **Dependabot** activado.
+
+Todos tienen prueba en la sección "E4" de `supabase/tests`: **67 ok**. Sin la migración de arreglos fallan exactamente las 8 pruebas nuevas.
+
+**Descartados:**
+- `npm audit` marca 2 altas y 7 moderadas/bajas, todas en las herramientas de compilación de Expo (`@expo/cli`, su `zod` interna, `glob`, `minimatch`, `deepmerge`). Corren en la máquina del desarrollador con entrada de confianza y no van en el bundle de la app. Se resuelven actualizando Expo con `npx expo install --fix` cuando publique parches.
+- El barrido de secretos del bundle marcó `sb_secret_`: es un falso positivo por dos cadenas internas pegadas ("ListVector**s**" + "**b_secret_**_internal…"). No hay claves.
+- Fuerza bruta del código de asistencia: solo el organizador puede validar, con 5 intentos por minuto y por plan, y solo inflaría la asistencia de su propio plan.
+
+**Notas para E5 (no son de seguridad):**
+- Al eliminar una cuenta, sus planes se borran en cascada (también los pasados y su chat). Los inscritos no reciben el aviso de cancelación porque el plan desaparece.
+- `private.rate_events` crece sin limpieza: falta un cron de limpieza (P1).
+
+**Checklist de lanzamiento (demo del 16):**
+
+| Área | Punto | Estado |
+|---|---|---|
+| Secretos | `.env` fuera del repo, `.env.example` presente, sin claves privadas con prefijo público | ✅ |
+| Secretos | Ningún secreto en el bundle | ✅ (barrido del export de Android) |
+| Auth | Proveedor probado (Supabase OTP), sesión en Keychain/Keystore | ✅ en código · ❓ en el proyecto real |
+| Auth | Cada RPC valida y autoriza por recurso; RLS en todas las tablas | ✅ (67 pruebas) |
+| Auth | Mensajes uniformes en login/registro; rate limit en OTP | ✅ en código · ❓ límites del proyecto |
+| Entrada/salida | Sin HTML crudo, sin SQL concatenado; errores genéricos al usuario | ✅ |
+| Entrada/salida | Subidas con límite, tipo y almacenamiento privado (carnés) | ✅ |
+| Navegador (CSP, CORS, CSRF) | App nativa sin web | ➖ (aplica al panel web, P1) |
+| Negocio | Pagos y webhooks | ➖ |
+| Negocio | Cuota de correos | ❓ SMTP con Gmail (500/día); revisar el límite del proveedor |
+| Negocio | Captcha en formularios públicos | ➖ (no hay formularios sin cuenta; el OTP tiene rate limit) |
+| Operación | Dependencias auditadas, lockfile, CI con permisos mínimos | ✅ |
+| Operación | Backups, entornos separados | ❓ |
+| Operación | Política de privacidad, términos | ✅ borradores en la app · ❓ revisión legal |
+| Base de datos | RLS completo, `security definer` con `search_path` vacío, buckets con políticas | ✅ |
+| Base de datos | Usuario A no lee ni edita datos de B; sin sesión no se lee nada | ✅ (pruebas) |
+| Base de datos | Restauración de backup probada | ❓ |
+| Después | `security.txt`, alertas, plan de incidentes | ➖ app nativa · ✅ contacto en la app y plan en §7 |
 
 ## 6. Pendientes `needs_validation`
 
 | Qué | Quién lo comprueba | Cómo |
 |---|---|---|
 | Política de tratamiento de datos, autorización explícita y canal de derechos (Ley 1581) | Equipo + asesoría legal | Redactar antes del lanzamiento; enlazar en el registro y en Ajustes |
-| Regla 18+ aplicada | Agente E2 / E4 | `CHECK` en la base de datos (fecha de nacimiento ≥ 18 años), la revisión del carné rechaza a los menores, y test que intenta registrar a un menor |
+| Regla 18+ en la revisión humana | Equipo | El servidor ya rechaza fechas de menores (prueba `menor de 18 rechazado`). Falta que quien revisa el carné compruebe que la fecha declarada coincide con el documento (`supabase/README.md` §2) |
+| Segunda revisión de seguridad independiente | Otro agente o persona | La skill pide que E4 la haga alguien distinto de quien construyó. Pasar `supabase/migrations/*.sql` y `mobile/src/lib` con el método de `review.md` |
+| Secret scanning y push protection en GitHub | Dueño del repo | Settings → Code security → activar "Secret scanning" y "Push protection" |
+| Supabase: solo el proveedor Email activo, "Secure email change" activado, Security Advisor sin alertas rojas | Equipo | `supabase/README.md` §1, pasos 6 y 8 |
+| Backups y restauración | Equipo | El plan gratis de Supabase no tiene PITR: exportar un dump (`supabase db dump`) antes de la demo y probar restaurarlo en otro proyecto |
 | Uso del dominio y el nombre de El Bosque fuera de la clase | Equipo | Hoy es un proyecto de la clase de Lenguajes Digitales (Start-ups). Si se lanza en público, hace falta autorización de la universidad |
 | Región de los datos en Supabase y transferencia internacional (la Ley 1581 la regula) | Equipo | Elegir región y declararlo en la política |
 | Límites reales de rate limit del Auth de Supabase y del proveedor de email | Agente E2 / E4 | Revisar la configuración del proyecto Supabase |

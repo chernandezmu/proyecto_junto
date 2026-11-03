@@ -12,6 +12,7 @@ const MESSAGES: Record<string, string> = {
   OWN_PLAN: 'Este plan es tuyo: ya estás dentro.',
   CLOSED: 'Este plan ya no recibe inscripciones.',
   FULL: 'Este plan se llenó.',
+  REJECTED: 'El organizador no aprobó tu solicitud para este plan. Hay más planes en tu campus.',
   CANCEL_CLOSED: 'Ya pasó el límite para cancelar. Avísale al organizador en el chat.',
   BAD_DATE: 'Elige una fecha y hora desde 15 minutos a partir de ahora y hasta 60 días.',
   TOO_MANY_ACTIVE_PLANS: 'Puedes tener hasta 3 planes activos a la vez. Termina o cancela uno para crear otro.',
