@@ -90,14 +90,46 @@ Estado: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ no aplica · ❓ needs
 | Baja | **H2 · Doble ciego roto sin asistencias validadas.** Si el organizador no validaba ningún código, cada calificación se revelaba al instante y podía deducir la nota de cada persona viendo cambiar su promedio | ✅ Se revela a los 3 días, o cuando calificaron **todos** los que llegaron y llegó alguien | `H2 · la nota de Nora no se revela todavía` |
 | Baja | **H3 · Re-solicitudes tras un rechazo.** Una persona rechazada podía volver a pedir cupo sin límite (acoso al organizador) y el plan le seguía saliendo en el feed | ✅ `join_plan` responde `REJECTED`; el plan sale de su feed; la app lo explica | `H3 · Nora no puede volver a pedir` · `H3 · el plan sale de su feed` |
 
-**Endurecimientos aplicados** (no cruzaban un límite por sí solos):
+**Segunda revisión · 2026-11-03.**
+- **Quién:** un agente independiente, sin el contexto de quien construyó, en solo lectura y validando cada caso en PGlite.
+- **Resultado:** encontró que H1 y H2 estaban incompletos y que E1 se podía saltar, además de dos problemas nuevos.
+- **Arreglos:** todo está en `supabase/migrations/20261103130000_e4_revision2.sql`.
+
+| Severidad | Hallazgo | Estado | Test de regresión |
+|---|---|---|---|
+| Media | **C1 · H1 se saltaba con bloquear.** Con el `id` real del asistente anónimo, `block_user` + `get_blocked` devolvían su nombre, foto y carrera, incluso desde otro campus o sin carné. El `id` fijo también permitía seguir a la persona entre planes | ✅ Arreglado: la entrada anónima lleva un `id` aleatorio, `block_user` solo acepta a gente del propio campus y `get_blocked` respeta la visibilidad | 5 pruebas `C1 · …` |
+| Baja | **C2 · Doble ciego aún deducible.** Validando asistencias de a poco, la nota de quien no llegó se veía al instante | ✅ Antes de 3 días solo cuentan las notas de quien llegó, con el plan terminado, ≥ 2 validados y todos con nota | 3 pruebas `C2 · …` |
+| Baja | **C3 · El límite de `check_in` no contaba los fallos.** El `raise` deshacía el contador: 503 intentos fallidos y acierto en el 504 | ✅ Un código incorrecto devuelve `{error:'BAD_CODE'}` sin `raise` y el intento queda contado. La app lo adapta | `C3 · el sexto intento queda bloqueado` |
+| Baja | **C4 · E1 se saltaba con una ruta inventada.** Se pasaba a "en revisión" sin subir el carné | ✅ El archivo debe existir en `verifications` y ser del propio usuario. Máximo 3 envíos al día | 3 pruebas `C4 · …` |
+| Baja | **C5 · Mensajes de sistema suplantables.** El `full_name` + `mark_arrived` publicaba un aviso "de sistema" sin autor ni opción de reportar, también en planes cancelados | ✅ Ahora es un mensaje normal del autor, solo en planes publicados y desde 2 h antes | 4 pruebas `C5 · …` |
+
+Notas de la segunda revisión que también se aplicaron:
+- el dominio se lee tras la **última** `@`;
+- el plan rechazado sale de "Hoy" en Inicio;
+- `finish_plan` solo funciona después de la hora de inicio;
+- la lista de espera exige poder ver el plan;
+- Android `allowBackup: false`;
+- el reporte o bloqueo desde el chat tiene acción accesible.
+
+Pruebas: **92 ok**. Sin esta migración fallan las de C1, C2 y C3, y la ejecución se corta antes de llegar a C4 y C5.
+
+**Pendientes de la segunda revisión** (endurecimiento, sin severidad; para antes de un lanzamiento público):
+- Se puede alternar sin límite entre solicitud pendiente y retirada.
+- `respond_request` no mira el estado del plan.
+- `interests` no limita el largo de cada elemento.
+- Bloquear no saca a la persona de los planes en curso.
+- Revocar la verificación no cierra los chats.
+- Las rutas de archivo admiten `..` dentro de la carpeta propia (sin impacto, porque las fotos son públicas).
+- Falta `npm ci --ignore-scripts` en CI.
+
+**Endurecimientos aplicados en la primera revisión** (no cruzaban un límite por sí solos):
 - **E1:** para ver planes hay que haber enviado el carné (antes bastaba el correo).
 - **E2:** la foto de perfil solo puede apuntar a la carpeta propia.
 - **E3:** el correo de la cuenta solo puede cambiar a otro del mismo campus.
 - **E4:** permisos explícitos para que `supabase_auth_admin` ejecute los triggers de `auth.users`.
 - **Dependabot** activado.
 
-Todos tienen prueba en la sección "E4" de `supabase/tests`: **67 ok**. Sin la migración de arreglos fallan exactamente las 8 pruebas nuevas.
+Todos tienen prueba en la sección "E4" de `supabase/tests`: **67 ok** en ese momento. Sin la migración de arreglos fallan exactamente las 8 pruebas nuevas.
 
 **Descartados:**
 - `npm audit` marca 2 altas y 7 moderadas/bajas, todas en las herramientas de compilación de Expo (`@expo/cli`, su `zod` interna, `glob`, `minimatch`, `deepmerge`). Corren en la máquina del desarrollador con entrada de confianza y no van en el bundle de la app. Se resuelven actualizando Expo con `npx expo install --fix` cuando publique parches.
@@ -137,7 +169,7 @@ Todos tienen prueba en la sección "E4" de `supabase/tests`: **67 ok**. Sin la m
 |---|---|---|
 | Política de tratamiento de datos, autorización explícita y canal de derechos (Ley 1581) | Equipo + asesoría legal | Redactar antes del lanzamiento; enlazar en el registro y en Ajustes |
 | Regla 18+ en la revisión humana | Equipo | El servidor ya rechaza fechas de menores (prueba `menor de 18 rechazado`). Falta que quien revisa el carné compruebe que la fecha declarada coincide con el documento (`supabase/README.md` §2) |
-| Segunda revisión de seguridad independiente | Otro agente o persona | La skill pide que E4 la haga alguien distinto de quien construyó. Pasar `supabase/migrations/*.sql` y `mobile/src/lib` con el método de `review.md` |
+| ~~Segunda revisión de seguridad independiente~~ | Agente independiente | ✅ Hecha el 2026-11-03: 5 hallazgos (C1–C5) arreglados (§5) |
 | Secret scanning y push protection en GitHub | Dueño del repo | Settings → Code security → activar "Secret scanning" y "Push protection" |
 | Supabase: solo el proveedor Email activo, "Secure email change" activado, Security Advisor sin alertas rojas | Equipo | `supabase/README.md` §1, pasos 6 y 8 |
 | Backups y restauración | Equipo | El plan gratis de Supabase no tiene PITR: exportar un dump (`supabase db dump`) antes de la demo y probar restaurarlo en otro proyecto |

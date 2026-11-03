@@ -8,8 +8,9 @@ Toda la lógica de seguridad vive aquí: RLS activado en todas las tablas y func
 2. **SQL Editor → New query**: ejecuta las migraciones **en orden**, cada una en su propia consulta (pega todo el archivo → Run). Cada una debe terminar sin errores:
    1. `migrations/20261029120000_init.sql`: esquema, RLS, RPC y Storage.
    2. `migrations/20261103120000_e4_seguridad.sql`: arreglos de la revisión de seguridad (E4).
+   3. `migrations/20261103130000_e4_revision2.sql`: arreglos de la segunda revisión (E4).
 
-   Si alguien ya había aplicado solo la primera, basta con ejecutar la segunda.
+   Si alguien ya había aplicado las primeras, basta con ejecutar las que falten, en orden.
 3. **Authentication → Sign In / Providers → Email**:
    - Email activado, **"Confirm email" activado**.
    - **Email OTP Length: 6**. Expiración: 600 segundos.
@@ -62,7 +63,7 @@ Para la demo se hace desde el panel de Supabase (el panel web propio es P1):
 ```bash
 cd supabase/tests
 npm install
-npm test        # 67 ok · 0 fallos
+npm test        # 92 ok · 0 fallos
 ```
 
 Corren la migración sobre PGlite (Postgres en WebAssembly) con stubs de Supabase. Comprueban:

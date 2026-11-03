@@ -128,7 +128,7 @@ export default function Chat() {
       ) : null}
       <Row wrap gap={6}>
         {QUICK.map((q) => (
-          <Chip key={q} label={q} onPress={() => (q === 'Voy tarde' ? api.arrived(id, true).then(() => qc.invalidateQueries({ queryKey: ['messages', id] })).catch(() => {}) : send(q))} />
+          <Chip key={q} label={q} onPress={() => send(q === 'Voy tarde' ? 'Voy un poco tarde.' : q)} />
         ))}
       </Row>
       <Row gap={8}>
@@ -183,6 +183,10 @@ function Bubble({ m, onLongPress }: { m: Message; onLongPress: () => void }) {
       <Pressable
         onLongPress={onLongPress}
         accessibilityHint={mine ? undefined : 'Mantén pulsado para reportar o bloquear'}
+        accessibilityActions={mine ? undefined : [{ name: 'longpress', label: 'Reportar o bloquear' }]}
+        onAccessibilityAction={(e) => {
+          if (e.nativeEvent.actionName === 'longpress') onLongPress();
+        }}
         style={{
           maxWidth: '82%',
           borderWidth,
