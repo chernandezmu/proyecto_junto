@@ -1,0 +1,69 @@
+# CI de Junto: cada push a main y cada pull request deben pasar todo esto.
+# Acciones fijadas por SHA (cadena de suministro, SECURITY.md · Dependencias y CI).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: App (tipos, lint, iconos, bundle)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - name: Tipos
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npx expo lint
+      - name: Configuración de Expo
+        run: npx --yes expo-doctor@1.21.5
+      - name: Iconos generados al día
+        run: |
+          npm run icons
+          git diff --exit-code -- src/components/icons.generated.ts
+      - name: Bundle de Android
+        run: npx expo export --platform android --output-dir dist
+      - name: Auditoría de dependencias (informativa)
+        run: npm audit --omit=dev --audit-level=critical
+        continue-on-error: true
+
+  database:
+    name: Base de datos (pruebas de seguridad)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: supabase/tests
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: supabase/tests/package-lock.json
+      - run: npm ci
+      - name: RLS y RPC (pruebas de seguridad)
+        run: npm test

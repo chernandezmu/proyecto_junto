@@ -26,6 +26,28 @@ Toda la documentación está en [`docs/`](docs/), organizada por apartados.
 
 ---
 
+## La app
+
+App móvil (Expo + React Native + TypeScript) con backend en Supabase. **Entrega: demo en celulares el 16 de noviembre de 2026.**
+- Estado por etapas: [`ROADMAP.md`](ROADMAP.md).
+- Seguridad: [`SECURITY.md`](SECURITY.md).
+- Guion de la presentación: [`DEMO.md`](DEMO.md).
+
+| Carpeta | Qué es | Cómo empezar |
+|---|---|---|
+| [`mobile/`](mobile/) | La app (36 pantallas del MVP de Eventos) | [`mobile/README.md`](mobile/README.md): correr en Expo Go y generar el APK |
+| [`supabase/`](supabase/) | Base de datos, seguridad (RLS + RPC), pruebas y datos de demo | [`supabase/README.md`](supabase/README.md): crear el proyecto, aplicar las migraciones, aprobar carnés |
+| [`design/`](design/) | Sistema de diseño y pantallas | [`DESIGN.md`](DESIGN.md) · [`design/preview.html`](design/preview.html) |
+| [`docs/`](docs/) | Documentación de producto | [Índice](docs/README.md) |
+
+Puesta en marcha, en resumen:
+1. Supabase: crear el proyecto y ejecutar las migraciones (`supabase/README.md`).
+2. Crear `mobile/.env`.
+3. `cd mobile && npm install && npx expo start`.
+4. Escanear el QR con Expo Go.
+
+---
+
 ## Los tres módulos
 
 - **Eventos** — descubrir y crear planes del campus con swipe. Es el MVP.

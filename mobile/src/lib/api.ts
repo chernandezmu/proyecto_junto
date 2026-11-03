@@ -131,7 +131,9 @@ export const api = {
   finishPlan: (planId: string) => rpcVoid('finish_plan', { p_plan_id: planId }),
   requests: (planId: string) => rpc('get_requests', { p_plan_id: planId }, z.array(RequestSchema)),
   respond: (planId: string, userId: string, accept: boolean) => rpcVoid('respond_request', { p_plan_id: planId, p_user_id: userId, p_accept: accept }),
-  checkIn: (planId: string, code: string) => rpc('check_in', { p_plan_id: planId, p_code: code }, PersonSchema),
+  // Un código incorrecto no es un error del servidor: vuelve como { error: 'BAD_CODE' } y cuenta para el límite.
+  checkIn: (planId: string, code: string) =>
+    rpc('check_in', { p_plan_id: planId, p_code: code }, z.union([PersonSchema, z.object({ error: z.literal('BAD_CODE') })])),
 
   join: (planId: string) => rpc('join_plan', { p_plan_id: planId }, z.object({ status: z.enum(['joined', 'pending', 'full']) })),
   cancelAttendance: (planId: string, reason?: string | null) => rpcVoid('cancel_attendance', { p_plan_id: planId, p_reason: reason ?? null }),

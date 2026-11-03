@@ -65,7 +65,7 @@ function FloatCard({ style, rotate, delay, fill, children }: { style: ViewStyle;
 function CardHead({ label, icon }: { label: string; icon: 'celebration' | 'directions_car' | 'landscape' | 'sports_soccer' }) {
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Text style={{ fontFamily: fonts.semibold, fontSize: 11, letterSpacing: 0.9 }} tone="onFill">
+      <Text style={{ fontFamily: fonts.semibold, fontSize: 12, letterSpacing: 0.9 }} tone="onFill">
         {label}
       </Text>
       <Icon name={icon} size={20} color={fills.onFill} />

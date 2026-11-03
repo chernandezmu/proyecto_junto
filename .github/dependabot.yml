@@ -1,0 +1,21 @@
+# Actualizaciones de seguridad semanales (SECURITY.md · Dependencias y CI).
+# Las dependencias de Expo se actualizan con `npx expo install --fix`, no a mano:
+# revisar cada PR de Dependabot con esa regla en mente.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /mobile
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      expo:
+        patterns: ['expo', 'expo-*', '@expo/*', 'react-native', 'react-native-*', '@react-native-community/*', 'react', 'react-dom']
+  - package-ecosystem: npm
+    directory: /supabase/tests
+    schedule:
+      interval: monthly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

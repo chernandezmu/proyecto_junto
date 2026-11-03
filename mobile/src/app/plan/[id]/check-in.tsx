@@ -31,8 +31,13 @@ export default function CheckIn() {
     setBusy(true);
     setResult(null);
     try {
-      const person = await api.checkIn(id, value);
-      setResult({ ok: true, text: `¡${person.name} llegó!` });
+      const res = await api.checkIn(id, value);
+      if ('error' in res) {
+        setResult({ ok: false, text: friendlyError(new Error(res.error)) });
+        setCode('');
+        return;
+      }
+      setResult({ ok: true, text: `¡${res.name} llegó!` });
       setCode('');
       await people.refetch();
     } catch (e) {

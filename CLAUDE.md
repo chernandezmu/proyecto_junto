@@ -19,7 +19,7 @@ mobile/      App Expo (SDK 58, React Native 0.88, React 19, TypeScript, Expo Rou
   src/theme/       tokens.ts (DESIGN.md en código), theme.tsx (oscuro por defecto)
 supabase/
   migrations/      esquema + RLS + RPC (el servidor decide)
-  tests/           pruebas de seguridad del esquema sobre PGlite (npm test → 50 ok)
+  tests/           pruebas de seguridad del esquema sobre PGlite (npm test → 92 ok)
 design/      export de Claude Design, preview.html, pages/mvp.md
 docs/        documentación de producto (del equipo)
 ```

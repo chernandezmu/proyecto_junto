@@ -15,6 +15,40 @@ Expo SDK 58 · React Native · TypeScript · Expo Router · Supabase.
 
 3. Abre la app **Expo Go** (App Store / Google Play) y escanea el QR. El teléfono y el computador deben estar en la misma red Wi-Fi (o usa `npx expo start --tunnel`).
 
+## Generar el APK para la demo (Android)
+
+El APK se construye en la nube de Expo (EAS), sin Android Studio. Se hace una vez configurado Supabase.
+
+1. Crea una cuenta gratis en [expo.dev](https://expo.dev). Desde `mobile/`, inicia sesión y vincula el proyecto; esto agrega el `projectId` a `app.json` y hay que guardar ese cambio en git:
+
+   ```bash
+   npx eas-cli@latest login
+   npx eas-cli@latest init
+   ```
+
+2. Carga en EAS las dos variables **públicas** de Supabase para el perfil `preview`, las mismas de tu `.env`. El `.env` no se sube a la nube:
+
+   ```bash
+   npx eas-cli@latest env:set --name EXPO_PUBLIC_SUPABASE_URL --value https://xxxx.supabase.co --environment preview --visibility plaintext
+   npx eas-cli@latest env:set --name EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY --value sb_publishable_... --environment preview --visibility plaintext
+   ```
+
+   Nunca subas a EAS la clave secreta ni la contraseña de la base de datos.
+
+3. Construye el APK:
+
+   ```bash
+   npx eas-cli@latest build -p android --profile preview
+   ```
+
+   Tarda unos 10–20 minutos. Al terminar, EAS da un enlace y un QR. Ábrelos en cada Android, descarga el APK e instálalo; el teléfono pedirá permitir "instalar apps de origen desconocido".
+
+4. En iPhone no hay APK: se usa **Expo Go** con `npx expo start --tunnel` (sin cuenta de Apple Developer no hay TestFlight).
+
+`eas.json` tiene dos perfiles:
+- **`preview`:** APK interno para la demo.
+- **`production`:** para las tiendas, después del 16 de noviembre.
+
 ## Comandos
 
 | Comando | Para qué |

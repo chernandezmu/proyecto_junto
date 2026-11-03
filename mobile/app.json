@@ -25,7 +25,8 @@
       "permissions": [
         "CAMERA",
         "POST_NOTIFICATIONS"
-      ]
+      ],
+      "allowBackup": false
     },
     "web": {
       "output": "single",
