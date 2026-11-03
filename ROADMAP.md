@@ -2,26 +2,36 @@
 
 > Estado del proyecto por etapas (ux-ui-and-code-skill). Al retomar una sesión, el agente lee este archivo primero y continúa en la **etapa actual**.
 
-## 📍 Dónde vamos (actualizado 2026-10-29)
+## 📍 Dónde vamos (actualizado 2026-11-03)
 
 | Etapa | Estado |
 |---|---|
 | E0 · Planificación | ✅ Terminada |
 | E1 · Diseño | ✅ Aprobada (barra de 5 pestañas + burbuja "+" sobre Mis planes) |
-| **E2 · Código** | **⏳ En curso: código del MVP completo y compilando; falta conectar Supabase y probar en teléfonos** |
-| E3 · Automatizaciones | ⬜ Pendiente |
+| **E2 · Código** | **⏳ Código del MVP completo y compilando; falta conectar Supabase y probar en teléfonos** |
+| **E3 · Automatizaciones** | **⏳ En paralelo: CI listo (rama `e3/ci`); APK configurado (rama `e3/eas-apk`), falta la cuenta de Expo** |
 | E4 · Seguridad | ⬜ Pendiente |
 | E5 · Pulido | ⬜ Pendiente |
 
 **Para retomar en un chat nuevo:** abrir la carpeta `app-junto` en VS Code, iniciar una sesión de Claude Code y decir *"sigamos con el proyecto"*. El agente lee `CLAUDE.md` y la sección **Relevo** de este archivo.
 
-**Próximo paso:**
-1. El usuario crea y configura el proyecto de Supabase siguiendo `supabase/README.md`.
-2. Después se prueba el flujo completo en Expo Go con 2–3 cuentas reales.
+**Ramas de trabajo** (se crean desde `main` y se unen con pull request):
+
+| Rama | Contenido | Estado |
+|---|---|---|
+| `main` | Lo aprobado | Al día hasta E2 (código) |
+| `e3/ci` | GitHub Actions: tipos, lint, iconos, bundle de Android y 50 pruebas de la base de datos | Lista para unir a `main` |
+| `e3/eas-apk` | `mobile/eas.json` (APK `preview`) + pasos en `mobile/README.md` + este ROADMAP. Va **encima de `e3/ci`**: unir primero `e3/ci` | Lista para unir; el build necesita cuenta de Expo |
+| `etapa-2-codigo` | Igual a `main` (histórica) | Se puede borrar |
+
+**Próximo paso (bloqueante, lo hace el equipo):**
+1. Crear y configurar el proyecto de Supabase con `supabase/README.md` y crear `mobile/.env`.
+2. Probar el flujo completo en Expo Go con 2–3 cuentas reales (rama nueva `e2/pruebas-dispositivo` para lo que haya que corregir).
+3. Crear la cuenta de Expo y generar el APK (`mobile/README.md` · "Generar el APK").
 
 **Entrega:** demo en celulares el 2026-11-16.
 
-**Etapa actual:** E2 · Código (todas las pantallas escritas; falta conectar Supabase y probar en dispositivo)
+**Etapa actual:** E2 · Código (falta conectar Supabase y probar en dispositivo) + E3 en paralelo (CI y APK)
 **Modo de avance:** Etapa por etapa con aprobación
 **Lienzo de diseño:** Claude Design (proyecto "Junto App"; copia de referencia en `design/claude-design/`)
 **Vía de código:** Desde Claude Design (el HTML exportado es referencia; se reescribe en React Native con tokens)
@@ -125,11 +135,11 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 - ➖ Panel web interno (pasa a P1; para el 16 se revisa desde el panel de Supabase)
 - **Salida:** flujo P0 usable de punta a punta en Expo Go (iPhone) y en Android
 
-### E3 · Automatizaciones — ⬜ · Profundidad: Estándar
-- ⬜ CI en GitHub Actions: lint, typecheck, tests, tests de RLS
-- ⬜ EAS Build: APK interno de Android (y build de iOS si hay cuenta de Apple)
-- ⬜ Notificación push del recordatorio 1 h antes con cron de Supabase
-- ⬜ Plantilla del email de código OTP en Supabase con el texto de Junto
+### E3 · Automatizaciones — ⏳ (en paralelo a E2) · Profundidad: Estándar
+- ✅ CI en GitHub Actions (`.github/workflows/ci.yml`, rama `e3/ci`): tipos, lint, expo-doctor, iconos al día, bundle de Android, auditoría informativa y las 50 pruebas de RLS. Acciones fijadas por SHA. Verificado en local; corre en GitHub al abrir el PR
+- ⏳ EAS Build: `mobile/eas.json` con el perfil `preview` (APK) y los pasos en `mobile/README.md` (rama `e3/eas-apk`). Falta que el equipo cree la cuenta de Expo, haga `eas init`, cargue las 2 variables públicas y lance el build
+- ✅ Recordatorio 1 h antes: es una notificación local (hecha en E2); no hace falta cron
+- ⏳ Plantilla del email con el código: documentada en `supabase/README.md` §1; la aplica el equipo al crear el proyecto
 - ➖ e2e con Maestro, emails con marca, Sentry (pasan a después del 16)
 - **Salida:** cada cambio en GitHub pasa lint, typecheck y tests, y genera un APK instalable
 
@@ -155,7 +165,7 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 > Lo actualiza cada agente al terminar su sesión (ver references/agents.md §4). El siguiente agente lo lee primero.
 
 - **Último agente:** Claude Code (Claude Opus 5.5)
-- **Etapa:** E2 casi completa (2026-10-29). Todo el código del MVP está escrito y compila; falta conectarlo a Supabase y probarlo en teléfonos.
+- **Etapa:** E2 casi completa + E3 en paralelo (2026-11-03). El código del MVP compila; faltan Supabase y la prueba en teléfonos. Se crearon las ramas `e3/ci` (CI) y `e3/eas-apk` (APK), descritas en "Dónde vamos".
 - **Hecho en esta sesión:** E0, E1 aprobado y E2 (ver checklist de E2 arriba).
 - **Siguiente paso concreto:**
   1. **Supabase (lo hace el usuario, ~15 min):** seguir `supabase/README.md` §1:
