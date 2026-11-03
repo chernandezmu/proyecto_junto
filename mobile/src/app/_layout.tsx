@@ -1,6 +1,7 @@
 import { BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque';
 import { Lexend_400Regular, Lexend_500Medium, Lexend_600SemiBold, Lexend_700Bold, useFonts } from '@expo-google-fonts/lexend';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-query';
+import { AppState, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -15,6 +16,13 @@ import { isConfigured } from '@/lib/supabase';
 import { ThemeProvider, useTheme } from '@/theme/theme';
 
 SplashScreen.preventAutoHideAsync();
+
+// Al volver a la app se refrescan los datos (p. ej. el carné recién aprobado en el panel).
+focusManager.setEventListener((setFocused) => {
+  if (Platform.OS === 'web') return;
+  const sub = AppState.addEventListener('change', (s) => setFocused(s === 'active'));
+  return () => sub.remove();
+});
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 20_000, retry: 1 } },
