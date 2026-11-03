@@ -3,5 +3,5 @@
   "private": true,
   "type": "module",
   "scripts": { "test": "node security.test.mjs" },
-  "devDependencies": { "@electric-sql/pglite": "0.3.16" }
+  "devDependencies": { "@electric-sql/pglite": "0.5.14" }
 }
