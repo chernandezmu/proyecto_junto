@@ -10,8 +10,8 @@
 | E1 · Diseño | ✅ Aprobada (barra de 5 pestañas + burbuja "+" sobre Mis planes) |
 | **E2 · Código** | **⏳ Código del MVP completo y compilando; falta conectar Supabase y probar en teléfonos** |
 | **E3 · Automatizaciones** | **⏳ En paralelo: CI listo (rama `e3/ci`); APK configurado (rama `e3/eas-apk`), falta la cuenta de Expo** |
-| **E4 · Seguridad** | **⏳ Revisión guiada hecha (rama `e4/seguridad`): 3 hallazgos (1 media, 2 bajas) arreglados con pruebas; sin altos ni críticos abiertos en lo revisado. Faltan las comprobaciones ❓ en el proyecto real** |
-| E5 · Pulido | ⬜ Pendiente |
+| **E4 · Seguridad** | **✅ Dos revisiones (la segunda independiente): 8 hallazgos (2 media, 6 bajas) arreglados con pruebas (92 ok); sin altos ni críticos abiertos en lo revisado. Faltan las comprobaciones ❓ en el proyecto real de Supabase** |
+| **E5 · Pulido** | **⏳ Rama `e5/pulido`: medido, limpiado, datos y guion de demo listos. Falta lo que exige teléfono: fluidez del swipe y lector de pantalla** |
 
 **Para retomar en un chat nuevo:** abrir la carpeta `app-junto` en VS Code, iniciar una sesión de Claude Code y decir *"sigamos con el proyecto"*. El agente lee `CLAUDE.md` y la sección **Relevo** de este archivo.
 
@@ -22,7 +22,8 @@
 | `main` | Lo aprobado | Al día hasta E2 (código) |
 | `e3/ci` | GitHub Actions: tipos, lint, iconos, bundle de Android y 50 pruebas de la base de datos | Lista para unir a `main` |
 | `e3/eas-apk` | `mobile/eas.json` (APK `preview`) + pasos en `mobile/README.md` + este ROADMAP. Va **encima de `e3/ci`**: unir primero `e3/ci` | Lista para unir; el build necesita cuenta de Expo |
-| `e4/seguridad` | Migración `20261103120000_e4_seguridad.sql` (arreglos H1–H3 y endurecimientos), 17 pruebas nuevas (67 en total), Dependabot, SECURITY.md §5 y la app adaptada al rechazo. Va **encima de `e3/eas-apk`** | Lista para unir después de `e3/ci` y `e3/eas-apk` |
+| `e4/seguridad` | Migraciones `20261103120000_e4_seguridad.sql` y `20261103130000_e4_revision2.sql` (H1–H3, C1–C5 y endurecimientos), 42 pruebas nuevas (92 en total), Dependabot, SECURITY.md §5 y la app adaptada. Va **encima de `e3/eas-apk`** | Lista para unir después de `e3/ci` y `e3/eas-apk` |
+| `e5/pulido` | Dependencias sobrantes fuera, versiones de Expo al día, accesibilidad, README principal, datos de demo (`supabase/demo/seed_demo.sql`) y guion (`DEMO.md`). Va **encima de `e4/seguridad`** | Lista para unir al final |
 | `etapa-2-codigo` | Igual a `main` (histórica) | Se puede borrar |
 
 **Próximo paso (bloqueante, lo hace el equipo):**
@@ -149,26 +150,30 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 - ✅ Barrido rápido del repo y del bundle de Android: sin secretos
 - ✅ Revisión guiada: 3 hallazgos (H1 media, H2 y H3 bajas) + 4 endurecimientos, todos arreglados en `supabase/migrations/20261103120000_e4_seguridad.sql`, con prueba de regresión que falla sin el arreglo
 - ✅ Tests de aislamiento entre campus y entre planes (67 en total)
-- ⏳ Segunda pasada por un agente distinto del que construyó (la primera la hizo el mismo agente; ver SECURITY.md §6)
+- ✅ Segunda pasada por un agente independiente: 5 hallazgos más (C1 media, C2–C5 bajas), arreglados en `20261103130000_e4_revision2.sql`
 - ⏳ Comprobaciones ❓ en el proyecto real de Supabase: trigger de dominio, borrar cuenta, ajustes de Auth, Security Advisor y backup (SECURITY.md §6)
 - ➖ Auditoría completa de 6 fases y CSP del panel web (P1, después del 16)
 - ⏳ Legal: borradores en la app; revisión legal antes de un lanzamiento público
 - **Salida:** sin hallazgos altos ni críticos abiertos
 
-### E5 · Optimización y pulido — ⬜ · Profundidad: Estándar
-- ⬜ Revisión rápida de rendimiento (fluidez del swipe en un Android de gama media)
-- ⬜ Accesibilidad final (TalkBack y VoiceOver en el flujo central)
-- ⬜ Pulido de UX, copy y movimiento
-- ⬜ Datos de demo realistas en Supabase (planes del campus, usuarios de prueba)
+### E5 · Optimización y pulido — ⏳ (adelantada al 2026-11-03) · Profundidad: Estándar
+- ✅ Rendimiento de la base de datos medido con volumen en PGlite (1.000 planes, 5.800 inscripciones): feed 43 ms, mis planes 22 ms, inicio 7 ms, detalle 4 ms. Sin cambios: dentro de presupuesto
+- ✅ Bundle de Android: 6,2 → 6,1 MB. Se quitaron `expo-device`, `expo-glass-effect`, `expo-web-browser` y `@expo/ui` (sin uso, detectados con `knip`). Parches de Expo SDK 58 al día; `expo-doctor` 20/20
+- ✅ Accesibilidad (revisión estática): todos los tocables con rol y etiqueta; acción accesible para reportar o bloquear en el chat; mínimo de 12 pt también en la bienvenida
+- ⏳ Fluidez del swipe en un Android de gama media y prueba con TalkBack y VoiceOver: requieren teléfono y Supabase
+- ⏳ Detalle del plan como hoja inferior (`presentation: 'formSheet'`): pendiente de probar en Android antes de cambiarlo
+- ✅ Datos de demo realistas: `supabase/demo/seed_demo.sql` (10 planes, idempotente, probado en PGlite)
+- ✅ Guion de la presentación: `DEMO.md` (recorrido de 7 min con 3 cuentas y plan B)
+- ✅ README principal con cómo poner en marcha la app
 - ➖ Ficha de las tiendas (P1)
-- **Salida:** APK final instalado en los celulares de la demo y guion de la presentación
+- **Salida:** APK final instalado en los celulares de la demo y guion de la presentación (el guion ya está; el APK depende de Supabase y la cuenta de Expo)
 
 ## Relevo
 
 > Lo actualiza cada agente al terminar su sesión (ver references/agents.md §4). El siguiente agente lo lee primero.
 
 - **Último agente:** Claude Code (Claude Opus 5.5)
-- **Etapa:** E2 casi completa + E3 y E4 adelantadas (2026-11-03). El código del MVP compila; faltan Supabase y la prueba en teléfonos. Ramas `e3/ci` → `e3/eas-apk` → `e4/seguridad` (en ese orden), descritas en "Dónde vamos". La revisión de seguridad dejó 3 hallazgos arreglados (SECURITY.md §5).
+- **Etapa:** E2 casi completa + E3, E4 y E5 adelantadas (2026-11-03). Todo lo que no requiere el proyecto de Supabase ni un teléfono está hecho. Ramas en cadena: `e3/ci` → `e3/eas-apk` → `e4/seguridad` → `e5/pulido` (unir en ese orden). Seguridad: 2 revisiones, 8 hallazgos arreglados (SECURITY.md §5).
 - **Hecho en esta sesión:** E0, E1 aprobado y E2 (ver checklist de E2 arriba).
 - **Siguiente paso concreto:**
   1. **Supabase (lo hace el usuario, ~15 min):** seguir `supabase/README.md` §1:
@@ -193,7 +198,7 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 - **Cómo verificar:**
   - `cd mobile && npx tsc --noEmit && npx expo lint && npx expo-doctor`;
   - `npx expo export --platform android` (bundle);
-  - `cd supabase/tests && npm install && npm test` → 67 ok.
+  - `cd supabase/tests && npm install && npm test` → 92 ok.
 - **Preguntas abiertas para el usuario:** crear el proyecto de Supabase y el SMTP; primer commit cuando lo pida.
 - **No tocar / ojo con:**
   - el HTML de Claude Design es referencia, no se pega en la app;
