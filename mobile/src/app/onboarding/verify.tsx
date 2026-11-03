@@ -1,9 +1,11 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 
 import { DateField } from '@/components/DateField';
-import { Banner, Button, Checkbox, Field, Icon, Row, Screen, Spacer, Text } from '@/components/ui';
+import { IdScanner } from '@/components/IdScanner';
+import { Banner, Button, Checkbox, Field, Icon, LinkButton, Row, Screen, Spacer, Text } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { errorCode, friendlyError } from '@/lib/errors';
@@ -21,15 +23,16 @@ export default function Verify() {
   const [consent, setConsent] = useState(!!me?.consented);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [scanning, setScanning] = useState(false);
 
   const maxBirth = new Date();
   maxBirth.setFullYear(maxBirth.getFullYear() - 16);
   const underage = !!birth && !isAdult(birth);
   const ready = !!file && studentCode.trim().length >= 3 && !!birth && !underage && consent;
 
-  async function choose(source: 'camera' | 'file') {
+  async function pickFile() {
     try {
-      const f = await pickIdDocument(source);
+      const f = await pickIdDocument('file');
       if (f) setFile(f);
     } catch (e) {
       Alert.alert('No pudimos abrir el archivo', friendlyError(e, (e as Error).message));
@@ -74,34 +77,68 @@ export default function Verify() {
         />
       ) : (
         <Text tone="muted" style={{ marginTop: -8 }}>
-          Sube tu carné o certificado de matrícula vigente.
+          Escanea tu carné vigente con la cámara.
         </Text>
       )}
 
       {file ? (
-        <View style={{ height: 150, borderRadius: radius.md, borderWidth, borderColor: colors.border, backgroundColor: fills.mint, alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12 }}>
-          <Icon name="check_circle" size={40} color={fills.onFill} />
-          <Text tone="onFill" style={{ fontFamily: 'Lexend_600SemiBold' }} numberOfLines={1}>
-            {file.name} · listo
-          </Text>
-          <Pressable onPress={() => setFile(null)} accessibilityRole="button" hitSlop={8}>
-            <Text variant="small" tone="onFill" style={{ textDecorationLine: 'underline' }}>
-              Cambiar archivo
-            </Text>
-          </Pressable>
-        </View>
-      ) : (
-        <View style={{ borderRadius: radius.md, borderWidth, borderColor: colors.border, backgroundColor: colors.muted, padding: 16, gap: 12, alignItems: 'center' }}>
-          <Icon name="badge" size={44} />
-          <Text variant="small" tone="muted" center>
-            JPG, PNG o PDF · máx. 10 MB
-          </Text>
-          <Row gap={10}>
-            <Button label="Tomar foto" icon="photo_camera" variant="secondary" onPress={() => choose('camera')} flex />
-            <Button label="Elegir archivo" icon="upload_file" variant="secondary" onPress={() => choose('file')} flex />
+        <View style={{ gap: 8 }}>
+          {file.mimeType.startsWith('image/') ? (
+            <Pressable onPress={() => setScanning(true)} accessibilityRole="button" accessibilityLabel="Carné escaneado. Toca para volver a escanear">
+              <Image
+                source={{ uri: file.uri }}
+                style={{ width: '100%', aspectRatio: 85.6 / 54, borderRadius: radius.md, borderWidth, borderColor: colors.border }}
+                contentFit="cover"
+              />
+              <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: fills.mint, borderWidth, borderColor: fills.onFill, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
+                <Icon name="check_circle" size={16} color={fills.onFill} />
+                <Text variant="tag" tone="onFill">
+                  Listo
+                </Text>
+              </View>
+            </Pressable>
+          ) : (
+            <View style={{ height: 120, borderRadius: radius.md, borderWidth, borderColor: colors.border, backgroundColor: fills.mint, alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12 }}>
+              <Icon name="check_circle" size={40} color={fills.onFill} />
+              <Text tone="onFill" style={{ fontFamily: 'Lexend_600SemiBold' }} numberOfLines={1}>
+                {file.name} · listo
+              </Text>
+            </View>
+          )}
+          <Row justify="center" gap={16}>
+            <LinkButton label="Volver a escanear" onPress={() => setScanning(true)} />
+            <LinkButton label="Quitar" onPress={() => setFile(null)} />
           </Row>
         </View>
+      ) : (
+        <Pressable
+          onPress={() => setScanning(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Escanear mi carné con la cámara"
+          style={({ pressed }) => ({
+            aspectRatio: 85.6 / 54,
+            borderRadius: radius.md,
+            borderWidth,
+            borderStyle: 'dashed',
+            borderColor: colors.border,
+            backgroundColor: pressed ? fills.sky : colors.muted,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            padding: 16,
+          })}
+        >
+          <Icon name="badge" size={44} />
+          <Text variant="title" center>
+            Toca para escanear tu carné
+          </Text>
+          <Text variant="small" tone="muted" center>
+            Se abre la cámara con un marco para encuadrarlo
+          </Text>
+        </Pressable>
       )}
+      {!file ? <LinkButton label="¿Tienes certificado de matrícula en PDF? Sube un archivo" onPress={pickFile} /> : null}
+      <IdScanner visible={scanning} onClose={() => setScanning(false)} onCapture={setFile} onPickFile={pickFile} />
 
       <Field label="Código estudiantil" placeholder="Ej. 20231234" value={studentCode} onChangeText={setStudentCode} autoCapitalize="none" autoCorrect={false} />
       <DateField

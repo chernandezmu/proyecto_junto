@@ -49,6 +49,13 @@
         {
           "color": "#e4f47c"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Junto usa la cámara para escanear tu carné y tomar tu foto de perfil.",
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {
