@@ -1,0 +1,12 @@
+{
+  "name": "Junto · Simulador",
+  "short_name": "Junto",
+  "description": "Simulador interactivo de la app Junto (datos de ejemplo).",
+  "lang": "es",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#16141d",
+  "theme_color": "#16141d",
+  "icons": [{ "src": "assets/icon.png", "sizes": "400x400", "type": "image/png", "purpose": "any" }]
+}
