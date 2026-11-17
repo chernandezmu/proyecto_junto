@@ -124,6 +124,19 @@ Los necesitas en el paso 4:
 
 Para la app del celular, los mismos dos valores van en `mobile/.env` (ver `supabase/README.md`, paso 7).
 
+### 2.10 Código de prueba `123456` (demo)
+Para la demo, la app acepta **`123456`** con **cualquier** correo `@unbosque.edu.co`, sin esperar el correo. Lo resuelve una función del servidor (`supabase/functions/demo-login/index.ts`) que hay que instalar una vez:
+
+1. En Supabase, menú izquierdo → **Edge Functions** → **Deploy a new function** → **Via Editor**.
+2. Nombre de la función: `demo-login` (exacto).
+3. Borra el código de ejemplo y pega **todo** el contenido de `supabase/functions/demo-login/index.ts`.
+4. **Deploy function**. Espera a que diga que quedó desplegada.
+5. En la función → **Details** (o **Settings**) → apaga **Verify JWT with legacy secret** / **Enforce JWT verification** → **Save**. Sin esto la app recibe "401" y muestra *"El código de prueba no está activo en el servidor"*.
+
+La función usa la llave de administrador que Supabase le da por dentro: no hay que copiar ninguna clave.
+
+> ⚠️ **Riesgo aceptado para la demo:** cualquiera con el link puede entrar como cualquier correo `@unbosque.edu.co` (ver sus planes, chats y perfil). Antes de abrir la app a estudiantes reales: **Edge Functions → demo-login → Delete** y `DEMO_CODE = null` en `mobile/src/lib/auth.tsx`.
+
 ---
 
 ## 3. Activar GitHub Pages en el repositorio
@@ -138,17 +151,11 @@ No hay que tocar nada más en esa página.
 
 ## 4. Darle a GitHub los datos de Supabase
 
-1. En el repositorio: **Settings → Secrets and variables → Actions**.
-2. Pestaña **Variables** → **New repository variable**:
-   | Name | Value |
-   |---|---|
-   | `EXPO_PUBLIC_SUPABASE_URL` | la Project URL del paso 2.9 |
-3. **New repository variable** otra vez:
-   | Name | Value |
-   |---|---|
-   | `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | la clave publicable del paso 2.9 |
+**Ya está hecho en este repositorio:** la Project URL y la clave publicable del paso 2.9 están escritas en `.github/workflows/pages.yml`, en las líneas `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Son valores públicos: igual terminan dentro de la página que descarga cualquier visitante.
 
-Se usan **Variables** y no **Secrets** porque son valores públicos: terminan dentro de la página que descarga cualquier visitante. Si prefieren guardarlas como **Secrets**, también funciona.
+Solo hay que tocarlo si cambian de proyecto de Supabase: editen esas dos líneas y hagan push a `main`.
+
+> ⚠️ En la URL va la dirección `https://…supabase.co`, **nunca** la cadena `postgresql://…` (lleva la contraseña de la base). El flujo se detiene si la URL no empieza por `https://` o si la clave es `sb_secret_`.
 
 ---
 
@@ -157,7 +164,6 @@ Se usan **Variables** y no **Secrets** porque son valores públicos: terminan de
 El flujo `.github/workflows/pages.yml` publica solo en cada `git push` a `main`. Para la primera vez:
 
 1. En el repositorio → pestaña **Actions** → a la izquierda **GitHub Pages** → **Run workflow** → rama `main` → **Run workflow**.
-   (Si ya hubo un push y falló porque faltaban las variables del paso 4, abre esa ejecución y toca **Re-run all jobs**.)
 2. Espera unos 3 a 5 minutos, hasta que los dos pasos (**Compilar la web** y **Publicar**) tengan ✅.
 3. El link aparece en la ejecución, debajo de **Publicar**, y en **Settings → Pages**: `https://chernandezmu.github.io/proyecto_junto/`.
 
@@ -232,7 +238,8 @@ Más detalles (reportes, borrar carnés a los 30 días): `supabase/README.md`, p
 
 | Problema | Solución |
 |---|---|
-| En **Actions**, "Compilar la web" falla con *Faltan las variables…* | Haz el paso 4 y luego **Re-run all jobs** |
+| En **Actions**, "Compilar la web" falla con *debe ser la Project URL* o *clave SECRETA* | Revisa las dos líneas de Supabase en `pages.yml` (paso 4) |
+| Con `123456` sale *"El código de prueba no está activo en el servidor"* | Falta instalar la función `demo-login` o apagar su verificación JWT (paso 2.10) |
 | "Publicar" falla con *Get Pages site failed* o *not found* | Falta el paso 3: **Settings → Pages → Source → GitHub Actions** |
 | El link da **404** de GitHub | La primera publicación tarda unos minutos. Revisa que la ejecución de **Actions** terminó en ✅ |
 | Página en blanco | Abre la consola del navegador (F12). Si dice *Invalid API key*, la clave del paso 4 está mal copiada |

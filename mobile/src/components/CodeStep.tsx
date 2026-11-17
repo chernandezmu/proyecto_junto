@@ -2,6 +2,7 @@ import { View } from 'react-native';
 
 import { OtpInput } from './OtpInput';
 import { Card, Icon, LinkButton, Row, Text } from '@/components/ui';
+import { DEMO_CODE } from '@/lib/auth';
 import { useTheme } from '@/theme/theme';
 
 /** Tarjeta "Código enviado a…" con las 6 casillas, error y reenvío. */
@@ -40,6 +41,11 @@ export function CodeStep({
             {error}
           </Text>
         </View>
+      ) : null}
+      {DEMO_CODE ? (
+        <Text variant="small" tone="muted">
+          Demo: también puedes entrar con el código {DEMO_CODE}.
+        </Text>
       ) : null}
       {wait > 0 ? (
         <Text variant="small" tone="muted">

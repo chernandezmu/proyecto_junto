@@ -6,7 +6,14 @@ import { api, type Me } from './api';
 import { supabase } from './supabase';
 
 export const ALLOWED_DOMAIN = 'unbosque.edu.co';
-export const isAllowedEmail = (email: string) => new RegExp(`^[^\\s@]+@${ALLOWED_DOMAIN.replace('.', '\\.')}$`, 'i').test(email.trim());
+/**
+ * Código fijo de DEMO: entra con cualquier correo @unbosque.edu.co sin esperar el correo
+ * (Edge Function supabase/functions/demo-login). Riesgo aceptado para la demo (SECURITY.md §4).
+ * Antes de abrir la app a estudiantes reales: null aquí y borrar la función en Supabase.
+ */
+export const DEMO_CODE: string | null = '123456';
+
+export const isAllowedEmail =(email: string) => new RegExp(`^[^\\s@]+@${ALLOWED_DOMAIN.replace('.', '\\.')}$`, 'i').test(email.trim());
 
 type AuthValue = {
   session: Session | null;
@@ -48,11 +55,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshMe: () => meQuery.refetch(),
     async sendCode(email, createUser) {
       const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase(), options: { shouldCreateUser: createUser } });
+      // Con el código de demo se puede seguir aunque el correo no salga (límite de envíos, SMTP).
+      if (DEMO_CODE) return;
       // Respuesta uniforme: si la cuenta no existe en el login no lo revelamos.
       if (error && !(!createUser && /signups not allowed|user not found/i.test(error.message))) throw error;
     },
     async verifyCode(email, code) {
-      const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code, type: 'email' });
+      const addr = email.trim().toLowerCase();
+      if (DEMO_CODE && code === DEMO_CODE) {
+        const { data, error } = await supabase.functions.invoke<{ token_hash?: string }>('demo-login', { body: { email: addr, code } });
+        if (error || !data?.token_hash) throw new Error('DEMO_LOGIN_FAILED');
+        const res = await supabase.auth.verifyOtp({ token_hash: data.token_hash, type: 'email' });
+        if (res.error) throw res.error;
+        return;
+      }
+      const { error } = await supabase.auth.verifyOtp({ email: addr, token: code, type: 'email' });
       if (error) throw error;
     },
     async signOut() {

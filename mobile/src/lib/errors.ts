@@ -21,6 +21,7 @@ const MESSAGES: Record<string, string> = {
   NOT_IN_WINDOW: 'Los códigos se validan desde 1 h antes del plan.',
   NOT_FINISHED: 'Podrás calificar cuando el plan empiece.',
   SELF: 'No puedes hacer eso contigo.',
+  DEMO_LOGIN_FAILED: 'El código de prueba no está activo en el servidor. Usa el código que llegó a tu correo o avisa al equipo.',
 };
 
 export function errorCode(e: unknown): string | null {

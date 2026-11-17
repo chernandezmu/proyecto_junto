@@ -186,6 +186,7 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
   - las 2 variables;
   - la URL en Supabase.
 - `expo-doctor` marca 11 paquetes con versión de parche nueva. No viene de este cambio; revisarlo con `npx expo install --check`.
+- **Publicado** en `https://chernandezmu.github.io/proyecto_junto/` (URL y clave publicable escritas en `pages.yml`; el flujo rechaza `postgresql://` y `sb_secret_`).- **Código de demo `123456`** con cualquier correo `@unbosque.edu.co` (pedido del equipo, riesgo aceptado en SECURITY.md §4): Edge Function `supabase/functions/demo-login` + `DEMO_CODE` en `mobile/src/lib/auth.tsx`. Instalar la función en Supabase (GITHUB-PAGES.md §2.10). **Quitarlo antes de estudiantes reales.**
 
 - **Último agente:** Claude Code (Claude Opus 5.5)
 - **Etapa:** E2 casi completa + E3, E4 y E5 adelantadas (2026-11-03). Todo lo que no requiere el proyecto de Supabase ni un teléfono está hecho. Ramas en cadena: `e3/ci` → `e3/eas-apk` → `e4/seguridad` → `e5/pulido` (unir en ese orden). Seguridad: 2 revisiones, 8 hallazgos arreglados (SECURITY.md §5).
