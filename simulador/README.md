@@ -96,6 +96,10 @@ Sirve para publicar sin GitHub o para probar rápido.
    ```
 4. Cada vez que cambies algo, repite `vercel --prod` dentro de `simulador/`.
 
+### Opción C · GitHub Pages (ya configurado)
+
+El workflow `.github/workflows/pages.yml` publica esta carpeta en **https://chernandezmu.github.io/proyecto_junto/simulador/** (y la app real en `…/proyecto_junto/`) con cada push a `main`. También se puede lanzar a mano en **Actions → GitHub Pages → Run workflow**. Configuración completa: [`../GITHUB-PAGES.md`](../GITHUB-PAGES.md).
+
 ---
 
 ## Paso 3 · Compartirlo y abrirlo en el celular
