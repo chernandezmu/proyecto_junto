@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { Button, Card, Icon, LinkButton, Row, Screen, Spacer, StatusIcon, Text, ToggleRow } from '@/components/ui';
 import { when } from '@/lib/format';
-import { cancelReminder, hasReminder, scheduleReminder } from '@/lib/notifications';
+import { cancelReminder, hasReminder, remindersAvailable, scheduleReminder } from '@/lib/notifications';
 import { usePlan, usePlanId } from '@/lib/usePlan';
 import { useTheme } from '@/theme/theme';
 
@@ -52,7 +52,7 @@ export default function Joined() {
           </Row>
         </Card>
       ) : null}
-      {!isPending ? (
+      {!isPending && remindersAvailable ? (
         <Card>
           <ToggleRow icon="alarm" label="Recordatorio 1 h antes" subtitle="Una notificación en este teléfono" value={reminder} onChange={toggleReminder} />
         </Card>

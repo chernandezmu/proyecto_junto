@@ -5,6 +5,8 @@ Una página web que imita la app Junto pantalla por pantalla, para que cualquier
 - **En el computador** se ve un teléfono en el centro y, a la izquierda, un menú con todos los apartados de la app.
 - **En el celular** la app ocupa toda la pantalla, como si estuviera instalada. Para saltar entre apartados se toca la **pestaña verde del borde izquierdo**.
 
+> **Ya se publica solo en GitHub Pages**, junto con la app real: `https://chernandezmu.github.io/proyecto_junto/simulador/` (ver [`../GITHUB-PAGES.md`](../GITHUB-PAGES.md)). Los pasos de Vercel de abajo solo hacen falta si quieren otro link aparte.
+
 Todo se puede tocar: deslizar planes, unirse, escribir en el chat, crear un plan, validar códigos, cambiar el tema… Los datos son de ejemplo y **no se conecta a Supabase**: nada se guarda ni se envía.
 
 ## Qué hay en esta carpeta

@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import * as SecureStore from 'expo-secure-store';
 import { AppState } from 'react-native';
+
+import { kv } from './storage';
 
 // Solo valores públicos: la URL del proyecto y la clave publicable (anon). Toda regla de
 // acceso vive en la base de datos (RLS + RPC). Nunca pongas aquí una clave secreta.
@@ -11,27 +12,28 @@ export const isConfigured = !!url && !!key;
 
 /**
  * Sesión en el almacén cifrado del sistema (Keychain / Keystore). SecureStore limita el
- * tamaño de cada valor, así que la sesión se guarda partida en trozos.
+ * tamaño de cada valor, así que la sesión se guarda partida en trozos. En la web, kv es
+ * localStorage (storage.web.ts).
  */
 const CHUNK = 1800;
 const secureStorage = {
   async getItem(k: string) {
-    const count = await SecureStore.getItemAsync(`${k}.n`);
+    const count = await kv.get(`${k}.n`);
     if (!count) return null;
-    const parts = await Promise.all(Array.from({ length: Number(count) }, (_, i) => SecureStore.getItemAsync(`${k}.${i}`)));
+    const parts = await Promise.all(Array.from({ length: Number(count) }, (_, i) => kv.get(`${k}.${i}`)));
     return parts.some((p) => p == null) ? null : parts.join('');
   },
   async setItem(k: string, value: string) {
-    const old = Number((await SecureStore.getItemAsync(`${k}.n`)) ?? 0);
+    const old = Number((await kv.get(`${k}.n`)) ?? 0);
     const parts = value.match(new RegExp(`.{1,${CHUNK}}`, 'gs')) ?? [''];
-    await Promise.all(parts.map((p, i) => SecureStore.setItemAsync(`${k}.${i}`, p)));
-    await SecureStore.setItemAsync(`${k}.n`, String(parts.length));
-    for (let i = parts.length; i < old; i++) await SecureStore.deleteItemAsync(`${k}.${i}`);
+    await Promise.all(parts.map((p, i) => kv.set(`${k}.${i}`, p)));
+    await kv.set(`${k}.n`, String(parts.length));
+    for (let i = parts.length; i < old; i++) await kv.remove(`${k}.${i}`);
   },
   async removeItem(k: string) {
-    const n = Number((await SecureStore.getItemAsync(`${k}.n`)) ?? 0);
-    for (let i = 0; i < n; i++) await SecureStore.deleteItemAsync(`${k}.${i}`);
-    await SecureStore.deleteItemAsync(`${k}.n`);
+    const n = Number((await kv.get(`${k}.n`)) ?? 0);
+    for (let i = 0; i < n; i++) await kv.remove(`${k}.${i}`);
+    await kv.remove(`${k}.n`);
   },
 };
 

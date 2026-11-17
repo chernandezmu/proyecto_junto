@@ -1,8 +1,8 @@
-import { Alert } from 'react-native';
-
 import { Button, Card, Header, ListRow, Screen, Segmented, Spacer, Text, ToggleRow } from '@/components/ui';
+import { showAlert } from '@/lib/dialog';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { remindersAvailable } from '@/lib/notifications';
 import { useTheme, type ThemePreference } from '@/theme/theme';
 
 export default function Settings() {
@@ -15,7 +15,7 @@ export default function Settings() {
       await api.updateProfile(me.id, { reminders_enabled: on });
       await refreshMe();
     } catch {
-      Alert.alert('No se pudo guardar', 'Revisa tu conexión e inténtalo de nuevo.');
+      showAlert('No se pudo guardar', 'Revisa tu conexión e inténtalo de nuevo.');
     }
   };
 
@@ -33,10 +33,14 @@ export default function Settings() {
           { value: 'system', label: 'Sistema', icon: 'contrast' },
         ]}
       />
-      <Text variant="label">Notificaciones</Text>
-      <Card>
-        <ToggleRow icon="alarm" label="Recordatorios" subtitle="1 h antes de cada plan, en este teléfono" value={me.remindersEnabled} onChange={setReminders} />
-      </Card>
+      {remindersAvailable ? (
+        <>
+          <Text variant="label">Notificaciones</Text>
+          <Card>
+            <ToggleRow icon="alarm" label="Recordatorios" subtitle="1 h antes de cada plan, en este teléfono" value={me.remindersEnabled} onChange={setReminders} />
+          </Card>
+        </>
+      ) : null}
       <Text variant="label">Cuenta</Text>
       <Card>
         <ListRow icon="school" title="Universidad" right={<Text variant="small" tone="muted">{me.campus.shortName}</Text>} />
@@ -49,7 +53,7 @@ export default function Settings() {
         variant="secondary"
         danger
         onPress={() =>
-          Alert.alert('¿Cerrar sesión?', 'Para volver a entrar te mandamos un código a tu correo.', [
+          showAlert('¿Cerrar sesión?', 'Para volver a entrar te mandamos un código a tu correo.', [
             { text: 'Cancelar', style: 'cancel' },
             { text: 'Cerrar sesión', style: 'destructive', onPress: () => signOut() },
           ])

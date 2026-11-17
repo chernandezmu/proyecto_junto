@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert } from 'react-native';
 
 import { RequestRow } from '@/components/RequestRow';
 import { Banner, Button, Card, ErrorCard, Field, Header, LinkButton, Row, Screen, Skeleton, Tag, Text } from '@/components/ui';
+import { showAlert } from '@/lib/dialog';
 import { api } from '@/lib/api';
 import { friendlyError } from '@/lib/errors';
 import { when } from '@/lib/format';
@@ -51,7 +51,7 @@ export default function Manage() {
   }
 
   function cancelPlan() {
-    Alert.alert('¿Cancelar el plan?', 'Les avisamos a las personas inscritas en el chat. No se puede deshacer.', [
+    showAlert('¿Cancelar el plan?', 'Les avisamos a las personas inscritas en el chat. No se puede deshacer.', [
       { text: 'Volver', style: 'cancel' },
       {
         text: 'Sí, cancelar el plan',

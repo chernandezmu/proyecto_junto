@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
-import { Alert, Pressable, ScrollView, TextInput } from 'react-native';
+import { Platform, Pressable, ScrollView, TextInput } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight, useReducedMotion } from 'react-native-reanimated';
 
 import { Button, Card, Chip, ErrorCard, Header, Icon, IconButton, Row, Screen, Skeleton, Text } from '@/components/ui';
+import { showAlert } from '@/lib/dialog';
 import { api, type Message } from '@/lib/api';
 import { friendlyError } from '@/lib/errors';
 import { time } from '@/lib/format';
@@ -61,7 +62,7 @@ export default function Chat() {
   function moreOptions(m: Message) {
     if (m.mine || !m.author) return;
     const author = m.author;
-    Alert.alert(author.name, undefined, [
+    showAlert(author.name, undefined, [
       { text: 'Reportar mensaje', onPress: () => router.push({ pathname: '/report', params: { type: 'message', id: String(m.id), name: author.name } }) },
       {
         text: `Bloquear a ${author.name}`,
@@ -182,7 +183,9 @@ function Bubble({ m, onLongPress }: { m: Message; onLongPress: () => void }) {
       </Text>
       <Pressable
         onLongPress={onLongPress}
-        accessibilityHint={mine ? undefined : 'Mantén pulsado para reportar o bloquear'}
+        // En la web no existe "mantener pulsado": un toque abre las opciones.
+        onPress={Platform.OS === 'web' && !mine ? onLongPress : undefined}
+        accessibilityHint={mine ? undefined : Platform.OS === 'web' ? 'Toca para reportar o bloquear' : 'Mantén pulsado para reportar o bloquear'}
         accessibilityActions={mine ? undefined : [{ name: 'longpress', label: 'Reportar o bloquear' }]}
         onAccessibilityAction={(e) => {
           if (e.nativeEvent.actionName === 'longpress') onLongPress();

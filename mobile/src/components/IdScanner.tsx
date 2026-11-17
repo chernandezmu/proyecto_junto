@@ -2,7 +2,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'expo-image';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { useRef, useState, type ComponentRef } from 'react';
-import { ActivityIndicator, Linking, Modal, Pressable, View, type LayoutRectangle } from 'react-native';
+import { ActivityIndicator, Linking, Modal, Platform, Pressable, View, type LayoutRectangle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Icon, IconButton, Text } from '@/components/ui';
@@ -101,6 +101,10 @@ export function IdScanner({ visible, onClose, onCapture, onPickFile }: Props) {
           </Text>
           {permission.canAskAgain ? (
             <Button label="Permitir cámara" icon="photo_camera" onPress={requestPermission} />
+          ) : Platform.OS === 'web' ? (
+            <Text variant="small" tone="muted" center>
+              Tu navegador bloqueó la cámara. Actívala en el candado junto a la dirección de la página y recarga, o sube un archivo.
+            </Text>
           ) : (
             <Button label="Abrir ajustes del teléfono" icon="settings" onPress={() => Linking.openSettings()} />
           )}
@@ -158,7 +162,9 @@ export function IdScanner({ visible, onClose, onCapture, onPickFile }: Props) {
         <SafeAreaView edges={['top', 'bottom']} style={{ position: 'absolute', inset: 0, justifyContent: 'space-between' }} pointerEvents="box-none">
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8 }}>
             <IconButton icon="close" label="Cerrar cámara" onPress={close} />
-            <IconButton icon="light_mode" label={torch ? 'Apagar linterna' : 'Encender linterna'} onPress={() => setTorch((t) => !t)} bg={torch ? fills.lime : undefined} color={torch ? fills.onFill : undefined} />
+            {Platform.OS !== 'web' ? (
+              <IconButton icon="light_mode" label={torch ? 'Apagar linterna' : 'Encender linterna'} onPress={() => setTorch((t) => !t)} bg={torch ? fills.lime : undefined} color={torch ? fills.onFill : undefined} />
+            ) : null}
           </View>
           <View style={{ alignItems: 'center', gap: 14, paddingBottom: 20 }}>
             {error ? (

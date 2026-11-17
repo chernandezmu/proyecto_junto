@@ -19,13 +19,31 @@ type Props = {
   error?: string | null;
 };
 
-/** Campo que abre el selector nativo (diálogo en Android, hoja con rueda en iPhone). */
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/** Date → valor de <input type="date|time"> (hora local). */
+function toInputValue(d: Date, mode: 'date' | 'time') {
+  return mode === 'date' ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Valor del <input> → Date, conservando la otra mitad (hora o fecha) de `base`. */
+function fromInputValue(v: string, mode: 'date' | 'time', base: Date) {
+  const nums = v.split(/[-:]/).map(Number);
+  if (!v || nums.some((n) => Number.isNaN(n))) return null;
+  const d = new Date(base);
+  if (mode === 'date') d.setFullYear(nums[0], nums[1] - 1, nums[2]);
+  else d.setHours(nums[0], nums[1], 0, 0);
+  return d;
+}
+
+/** Campo que abre el selector nativo (diálogo en Android, hoja con rueda en iPhone, selector del navegador en la web). */
 export function DateField({ label, value, onChange, mode = 'date', placeholder, format, minimumDate, maximumDate, helper, error }: Props) {
   const { colors, scheme } = useTheme();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Date>(value ?? maximumDate ?? new Date());
 
   const show = () => {
+    if (Platform.OS === 'web') return; // lo abre el <input> de abajo
     if (Platform.OS === 'android') {
       DateTimePickerAndroid.open({
         value: value ?? maximumDate ?? new Date(),
@@ -66,6 +84,28 @@ export function DateField({ label, value, onChange, mode = 'date', placeholder, 
           {value ? format(value) : placeholder}
         </Text>
         <Icon name={mode === 'date' ? 'calendar_month' : 'schedule'} />
+        {Platform.OS === 'web' ? (
+          // En la web, un <input> nativo e invisible encima del campo abre el selector del navegador.
+          <input
+            type={mode}
+            aria-label={label}
+            value={value ? toInputValue(value, mode) : ''}
+            min={mode === 'date' && minimumDate ? toInputValue(minimumDate, 'date') : undefined}
+            max={mode === 'date' && maximumDate ? toInputValue(maximumDate, 'date') : undefined}
+            onClick={(e) => {
+              try {
+                e.currentTarget.showPicker?.();
+              } catch {
+                // Navegadores sin showPicker: el clic sobre el input ya lo abre.
+              }
+            }}
+            onChange={(e) => {
+              const d = fromInputValue(e.currentTarget.value, mode, value ?? new Date());
+              if (d) onChange(d);
+            }}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, border: 0, margin: 0, padding: 0, cursor: 'pointer', colorScheme: scheme }}
+          />
+        ) : null}
       </Pressable>
       {error ? (
         <Text variant="small" tone="danger">

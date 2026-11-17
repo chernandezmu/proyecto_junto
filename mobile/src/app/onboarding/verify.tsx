@@ -1,11 +1,12 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { DateField } from '@/components/DateField';
 import { IdScanner } from '@/components/IdScanner';
 import { Banner, Button, Checkbox, Field, Icon, LinkButton, Row, Screen, Spacer, Text } from '@/components/ui';
+import { showAlert } from '@/lib/dialog';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { errorCode, friendlyError } from '@/lib/errors';
@@ -35,7 +36,7 @@ export default function Verify() {
       const f = await pickIdDocument('file');
       if (f) setFile(f);
     } catch (e) {
-      Alert.alert('No pudimos abrir el archivo', friendlyError(e, (e as Error).message));
+      showAlert('No pudimos abrir el archivo', friendlyError(e, (e as Error).message));
     }
   }
 
@@ -53,7 +54,7 @@ export default function Verify() {
     } catch (e) {
       if (path) await removeIdDocument(path).catch(() => {});
       if (errorCode(e) === 'UNDERAGE') {
-        Alert.alert('Junto es para mayores de 18', 'Cuando cumplas 18 te esperamos. No guardamos el carné que enviaste.', [{ text: 'Entendido', onPress: () => signOut() }]);
+        showAlert('Junto es para mayores de 18', 'Cuando cumplas 18 te esperamos. No guardamos el carné que enviaste.', [{ text: 'Entendido', onPress: () => signOut() }]);
       } else {
         setError(friendlyError(e, (e as Error).message));
       }

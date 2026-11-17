@@ -30,7 +30,13 @@
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "name": "Junto",
+      "shortName": "Junto",
+      "lang": "es",
+      "description": "Planes del campus entre estudiantes verificados de la Universidad El Bosque.",
+      "backgroundColor": "#16141d",
+      "themeColor": "#16141d"
     },
     "plugins": [
       "expo-router",

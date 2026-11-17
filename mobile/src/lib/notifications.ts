@@ -16,6 +16,9 @@ Notifications.setNotificationHandler({
   }),
 });
 
+/** En la web no hay recordatorios (ver notifications.web.ts). */
+export const remindersAvailable = true;
+
 const CHANNEL = 'recordatorios';
 const idFor = (planId: string) => `plan-${planId}`;
 

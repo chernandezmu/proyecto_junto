@@ -60,6 +60,7 @@ Estado: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ no aplica · ❓ needs
 |---|---|---|
 | Secretos | `.env` fuera del repo; en la app solo `EXPO_PUBLIC_SUPABASE_URL` y la clave `anon` (todo `EXPO_PUBLIC_*` es público); `service_role` solo en Edge Functions y en el panel | ⏳ |
 | Auth | OTP de Supabase, sesión guardada en `expo-secure-store`, códigos que caducan, respuestas uniformes, cierre de sesión en todos los dispositivos | ⏳ |
+| Versión web (GitHub Pages) | Misma base de datos y mismas reglas (RLS + RPC): la seguridad no depende del cliente. **Riesgo aceptado para la prueba con link:** la sesión vive en `localStorage` (si un script ajeno se ejecutara en la página, podría leerla) y GitHub Pages no permite cabeceras propias (sin CSP ni `frame-ancestors`). Mitigación: sin HTML de usuarios en la página (React escapa el texto), sin scripts de terceros, dependencias fijadas. El flujo `pages.yml` rechaza una clave `sb_secret_`. Antes de un lanzamiento público: hosting con cabeceras (CSP, HSTS) o solo apps nativas | ⏳ |
 | Autorización | Denegar por defecto; RLS activado en **todas** las tablas; políticas por campus, por membresía y por bloqueo | ⏳ |
 | Base de datos | RLS + tests de políticas (pgTAP o tests de integración), backups de Supabase activos, migraciones versionadas | ⏳ |
 | Entrada/salida | Esquemas zod en Edge Functions, `CHECK` en Postgres (longitudes, cupos > 0, fechas futuras), texto de chat sin HTML | ⏳ |

@@ -172,6 +172,21 @@ Leyenda: ✅ hecho · ⏳ en curso · ⬜ pendiente · ➖ omitido · ❓ needs_
 
 > Lo actualiza cada agente al terminar su sesión (ver references/agents.md §4). El siguiente agente lo lee primero.
 
+**Sesión 2026-11-17 · versión web (Claude Code, Claude Opus 5.5):**
+- La app ya corre en el navegador y se publica en GitHub Pages con `.github/workflows/pages.yml`: la app en `/proyecto_junto/` y el simulador en `/proyecto_junto/simulador/`.
+- **Cambios en el código:**
+  - `storage(.web).ts` y `notifications.web.ts`;
+  - `dialog.ts`: `showAlert` reemplaza a `Alert.alert`;
+  - fecha con `<input>` en web;
+  - arreglo de NetInfo en web: sin él marcaba "Sin conexión" y pausaba las consultas;
+  - `app.config.js` (`EXPO_BASE_URL`) y `public/index.html`.
+- **Probado:** con Supabase simulado en Edge (celular y escritorio): sesión, feed, unirse, chat, fechas, escáner con cámara falsa y subida del carné, descarga de datos y tema.
+- **Pendiente del usuario:** seguir `GITHUB-PAGES.md`:
+  - Pages con **Source: GitHub Actions**;
+  - las 2 variables;
+  - la URL en Supabase.
+- `expo-doctor` marca 11 paquetes con versión de parche nueva. No viene de este cambio; revisarlo con `npx expo install --check`.
+
 - **Último agente:** Claude Code (Claude Opus 5.5)
 - **Etapa:** E2 casi completa + E3, E4 y E5 adelantadas (2026-11-03). Todo lo que no requiere el proyecto de Supabase ni un teléfono está hecho. Ramas en cadena: `e3/ci` → `e3/eas-apk` → `e4/seguridad` → `e5/pulido` (unir en ese orden). Seguridad: 2 revisiones, 8 hallazgos arreglados (SECURITY.md §5).
 - **Hecho en esta sesión:** E0, E1 aprobado y E2 (ver checklist de E2 arriba).

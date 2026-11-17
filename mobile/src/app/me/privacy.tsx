@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
-import { Alert, Linking, Share, View } from 'react-native';
+import { Linking, View } from 'react-native';
 
 import { Button, Card, Header, Icon, ListRow, Screen, Segmented, Text, ToggleRow } from '@/components/ui';
+import { saveTextFile, showAlert } from '@/lib/dialog';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { friendlyError } from '@/lib/errors';
@@ -20,21 +21,21 @@ export default function Privacy() {
       await api.updateProfile(me.id, patch);
       await refreshMe();
     } catch {
-      Alert.alert('No se pudo guardar', 'Revisa tu conexión e inténtalo de nuevo.');
+      showAlert('No se pudo guardar', 'Revisa tu conexión e inténtalo de nuevo.');
     }
   };
 
   const exportData = async () => {
     try {
       const data = await api.exportData();
-      await Share.share({ title: 'Mis datos de Junto', message: JSON.stringify(data, null, 2) });
+      await saveTextFile('mis-datos-junto.json', JSON.stringify(data, null, 2), 'Mis datos de Junto');
     } catch (e) {
-      Alert.alert('No pudimos exportar tus datos', friendlyError(e));
+      showAlert('No pudimos exportar tus datos', friendlyError(e));
     }
   };
 
   const deleteAccount = () =>
-    Alert.alert('¿Eliminar tu cuenta?', 'Borramos tu perfil, tus inscripciones, tus mensajes y tus calificaciones. Los planes futuros que organizas se cancelan. No se puede deshacer.', [
+    showAlert('¿Eliminar tu cuenta?', 'Borramos tu perfil, tus inscripciones, tus mensajes y tus calificaciones. Los planes futuros que organizas se cancelan. No se puede deshacer.', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Eliminar mi cuenta',
@@ -45,7 +46,7 @@ export default function Privacy() {
             await api.deleteAccount();
             await signOut();
           } catch (e) {
-            Alert.alert('No pudimos eliminar tu cuenta', friendlyError(e));
+            showAlert('No pudimos eliminar tu cuenta', friendlyError(e));
           }
         },
       },

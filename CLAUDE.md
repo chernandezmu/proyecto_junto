@@ -36,6 +36,12 @@ docs/        documentación de producto (del equipo)
 - Datos: siempre por `api.*` (RPC validadas con zod). Las tablas están cerradas por RLS: no hagas `select` directo salvo el perfil propio.
 - Errores al usuario con `friendlyError()` (causa + solución). Estados vacío/carga/error en cada pantalla (`design/pages/mvp.md` §4).
 - Accesibilidad: labels en botones de icono, áreas ≥ 44/48, swipe con botones equivalentes, `useReducedMotion`.
+- **También corre en la web** (GitHub Pages, `GITHUB-PAGES.md`):
+  - avisos con `showAlert` de `@/lib/dialog`, nunca `Alert.alert` (en la web no hace nada);
+  - para compartir, `shareText` / `saveTextFile`;
+  - guardar en el dispositivo con `kv` de `@/lib/storage`, no `SecureStore` directo;
+  - lo que no exista en el navegador va en un archivo `.web.ts` o detrás de `Platform.OS === 'web'`;
+  - comprobar con `npx expo export --platform web`.
 - Antes de dar algo por terminado: `cd mobile && npx tsc --noEmit && npx expo lint`, y si tocaste SQL: `cd supabase/tests && npm test`.
 
 ## Decisiones técnicas ya tomadas
@@ -43,5 +49,6 @@ docs/        documentación de producto (del equipo)
 - Login sin contraseña: código de 6 dígitos al correo `@unbosque.edu.co` (Supabase OTP). El dominio se valida también en el servidor (trigger en `auth.users`).
 - Recordatorio 1 h antes = notificación **local** programada en el teléfono (funciona en Expo Go). Sin push remoto en el MVP.
 - Sin mapa embebido (Google Maps exige clave en el APK): lugar en texto + "Abrir en Maps".
-- Sesión en `expo-secure-store` (troceada), no en almacenamiento plano.
+- Sesión en `expo-secure-store` (troceada), no en almacenamiento plano. En la web, `localStorage` (riesgo aceptado, SECURITY.md).
+- Versión web en GitHub Pages bajo `/proyecto_junto` (repo público; Vercel sin cupo): `.github/workflows/pages.yml` publica la app y `simulador/` en cada push a `main`.
 - Fotos de perfil y de planes en bucket público `media` con rutas aleatorias; carnés en bucket privado `verifications`.

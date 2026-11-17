@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Avatar, Button, Chip, Field, Icon, Row, Spacer, Stepper, Text } from '@/components/ui';
+import { showAlert } from '@/lib/dialog';
 import { api, type Me } from '@/lib/api';
 import { friendlyError } from '@/lib/errors';
 import { pickPhoto, uploadPhoto } from '@/lib/media';
@@ -31,7 +32,7 @@ export function ProfileForm({ me, submitLabel, onDone }: { me: Me; submitLabel: 
       setBusy(true);
       setPhoto(await uploadPhoto(me.id, f));
     } catch (e) {
-      Alert.alert('No pudimos subir la foto', friendlyError(e, (e as Error).message));
+      showAlert('No pudimos subir la foto', friendlyError(e, (e as Error).message));
     } finally {
       setBusy(false);
     }

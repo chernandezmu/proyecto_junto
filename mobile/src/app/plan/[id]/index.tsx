@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
-import { Share, View } from 'react-native';
+import { View } from 'react-native';
 
 import { categoryOf, PlanMedia, PlanStatusTag } from '@/components/plan';
 import { Avatar, AvatarStack, Banner, Button, Card, Chip, ErrorCard, Header, Icon, IconButton, LinkButton, Row, Screen, Skeleton, Text } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { shareText } from '@/lib/dialog';
 import { friendlyError } from '@/lib/errors';
 import { when } from '@/lib/format';
 import { usePlan, usePlanId, useRefreshPlans } from '@/lib/usePlan';
@@ -42,7 +43,7 @@ export default function PlanDetail() {
   const approved = me?.verification === 'approved';
 
   const share = () =>
-    Share.share({ message: `${p.title} · ${when(p.startsAt)} · ${p.place}. Únete en Junto (solo estudiantes de El Bosque).` }).catch(() => {});
+    shareText(`${p.title} · ${when(p.startsAt)} · ${p.place}. Únete en Junto (solo estudiantes de El Bosque).`).catch(() => {});
   const toggleSaved = async () => {
     try {
       await api.toggleSaved(p.id);

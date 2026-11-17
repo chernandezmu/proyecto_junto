@@ -37,7 +37,8 @@ App móvil (Expo + React Native + TypeScript) con backend en Supabase. **Entrega
 |---|---|---|
 | [`mobile/`](mobile/) | La app (36 pantallas del MVP de Eventos) | [`mobile/README.md`](mobile/README.md): correr en Expo Go y generar el APK |
 | [`supabase/`](supabase/) | Base de datos, seguridad (RLS + RPC), pruebas y datos de demo | [`supabase/README.md`](supabase/README.md): crear el proyecto, aplicar las migraciones, aprobar carnés |
-| [`simulador/`](simulador/) | Simulador web de la app (datos de ejemplo) para verla desde un link | [`simulador/README.md`](simulador/README.md): publicarlo en Vercel |
+| Web (GitHub Pages) | La app real en el navegador, conectada a Supabase: `https://chernandezmu.github.io/proyecto_junto/` | [`GITHUB-PAGES.md`](GITHUB-PAGES.md): crear Supabase y publicar paso a paso |
+| [`simulador/`](simulador/) | Simulador web de la app (datos de ejemplo) para verla desde un link: `…/proyecto_junto/simulador/` | [`simulador/README.md`](simulador/README.md) |
 | [`design/`](design/) | Sistema de diseño y pantallas | [`DESIGN.md`](DESIGN.md) · [`design/preview.html`](design/preview.html) |
 | [`docs/`](docs/) | Documentación de producto | [Índice](docs/README.md) |
 

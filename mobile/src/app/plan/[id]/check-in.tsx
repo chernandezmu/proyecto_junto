@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert } from 'react-native';
 
 import { OtpInput } from '@/components/OtpInput';
 import { RequestRow } from '@/components/RequestRow';
 import { Banner, Button, Card, ErrorCard, Header, Row, Screen, Skeleton, Tag, Text } from '@/components/ui';
+import { showAlert } from '@/lib/dialog';
 import { api } from '@/lib/api';
 import { friendlyError } from '@/lib/errors';
 import { remaining } from '@/lib/format';
@@ -49,7 +49,7 @@ export default function CheckIn() {
   }
 
   function finish() {
-    Alert.alert('¿Terminar el plan?', 'Se habilita la calificación para todos y el plan pasa a Pasados.', [
+    showAlert('¿Terminar el plan?', 'Se habilita la calificación para todos y el plan pasa a Pasados.', [
       { text: 'Todavía no', style: 'cancel' },
       {
         text: 'Terminar',

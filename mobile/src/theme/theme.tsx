@@ -1,6 +1,7 @@
-import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
+
+import { kv } from '@/lib/storage';
 
 import { palettes, type Colors, type Scheme } from './tokens';
 
@@ -22,7 +23,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [preference, setPref] = useState<ThemePreference>('dark');
 
   useEffect(() => {
-    SecureStore.getItemAsync(KEY)
+    kv.get(KEY)
       .then((v) => {
         if (v === 'dark' || v === 'light' || v === 'system') setPref(v);
       })
@@ -37,7 +38,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       preference,
       setPreference: (p) => {
         setPref(p);
-        SecureStore.setItemAsync(KEY, p).catch(() => {});
+        kv.set(KEY, p).catch(() => {});
       },
     };
   }, [preference, system]);

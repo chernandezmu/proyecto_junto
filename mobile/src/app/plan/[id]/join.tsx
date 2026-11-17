@@ -8,7 +8,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { friendlyError } from '@/lib/errors';
 import { cancelBy, time, when } from '@/lib/format';
-import { scheduleReminder } from '@/lib/notifications';
+import { remindersAvailable, scheduleReminder } from '@/lib/notifications';
 import { usePlan, usePlanId, useRefreshPlans } from '@/lib/usePlan';
 import { fills } from '@/theme/tokens';
 import { useTheme } from '@/theme/theme';
@@ -91,7 +91,7 @@ export default function JoinConfirm() {
             </Text>
           </View>
         </Row>
-        {me?.remindersEnabled ? (
+        {remindersAvailable && me?.remindersEnabled ? (
           <Row gap={12} style={{ alignItems: 'flex-start' }}>
             <Icon name="alarm" />
             <View style={{ flex: 1 }}>
