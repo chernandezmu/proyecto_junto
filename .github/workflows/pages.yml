@@ -26,11 +26,11 @@ jobs:
       run:
         working-directory: mobile
     env:
-      # Valores PÚBLICOS (URL del proyecto y clave publicable). Se guardan como variables del
-      # repositorio: Settings → Secrets and variables → Actions → Variables.
-      # Nunca pongas aquí la service_role / secret key.
-      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL || secrets.EXPO_PUBLIC_SUPABASE_URL }}
-      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY || secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      # Valores PÚBLICOS a propósito: terminan dentro de la web publicada. La clave publicable es
+      # segura en el navegador; lo que protege los datos es RLS + RPC (SECURITY.md).
+      # Nunca pongas aquí la secret key (sb_secret_…) ni la cadena postgresql:// (lleva la contraseña).
+      EXPO_PUBLIC_SUPABASE_URL: https://weamvgiqssnsvadwonqq.supabase.co
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_BjoL3hwjjNe97Hub6TIfUg_B73BrGPd
       # El sitio vive en /<repo>/, no en la raíz del dominio (lo lee mobile/app.config.js).
       EXPO_BASE_URL: /${{ github.event.repository.name }}
     steps:
