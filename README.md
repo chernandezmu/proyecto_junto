@@ -64,3 +64,5 @@ Los tres se apoyan en una capa común de identidad estudiantil verificada.
 
 - [Diagrama de flujo (FigJam)](https://www.figma.com/board/xIzglMlvBBqPUCMYuZ64w3)
 - [Prototipo navegable](https://claude.ai/artifact/6QYgNHT3xDMk7zeR5sUyZ8)
+- [App web en vivo](https://chernandezmu.github.io/proyecto_junto/)
+- [Simulador web](https://chernandezmu.github.io/proyecto_junto/simulador/)
